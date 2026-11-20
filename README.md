@@ -1,7 +1,7 @@
 # 39th SOPT SOPKATHON WEB2 Server
 
 ## 🛠 Tech Stack
-- Java 17, Spring Boot 4.1.0
+- Java 21, Spring Boot 4.1.0
 - Spring Data JPA, MySQL (운영) / H2 (로컬·테스트)
 - Lombok, springdoc-openapi (Swagger), Gradle
 

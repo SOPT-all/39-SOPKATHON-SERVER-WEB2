@@ -1,5 +1,5 @@
 # 프로젝트 개요
-- 스택: Java 17, Spring Boot 4.1.0, Spring Data JPA, MySQL(운영) / H2(로컬·테스트), Lombok, springdoc(Swagger), Gradle
+- 스택: Java 21, Spring Boot 4.1.0, Spring Data JPA, MySQL(운영) / H2(로컬·테스트), Lombok, springdoc(Swagger), Gradle
 - 구조: `org.sopt.sopkathon` 아래 `domain`(도메인별 패키지) + `global`
   - `domain/<도메인>`은 `controller` / `service` / `repository` / `entity` / `dto` / `code`(도메인 에러·성공 코드)로 구분
   - `global`은 `common`(`code`, `entity`) / `config` / `exception` / `response`
