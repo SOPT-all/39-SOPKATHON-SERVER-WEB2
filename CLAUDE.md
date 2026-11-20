@@ -1,5 +1,5 @@
 # 프로젝트 개요
-- 스택: Java 17, Spring Boot 4.1.0, Spring Data JPA, MySQL(운영) / H2(로컬·테스트), Lombok, springdoc(Swagger), Gradle
+- 스택: Java 21, Spring Boot 4.1.0, Spring Data JPA, MySQL(로컬·운영) / H2(테스트), Docker Compose(로컬 MySQL), Lombok, springdoc(Swagger), Gradle
 - 구조: `org.sopt.sopkathon` 아래 `domain`(도메인별 패키지) + `global`
   - `domain/<도메인>`은 `controller` / `service` / `repository` / `entity` / `dto` / `code`(도메인 에러·성공 코드)로 구분
   - `global`은 `common`(`code`, `entity`) / `config` / `exception` / `response`
@@ -7,7 +7,8 @@
 # 명령어
 - 빌드: `./gradlew build`
 - 테스트: `./gradlew test` (`test` 프로필, H2 인메모리)
-- 로컬 실행: `./gradlew bootRun` (기본 `local` 프로필, H2 인메모리라 DB 설치 불필요)
+- 로컬 DB: `cp .env.example .env` 후 값 설정 → `docker compose up -d` (MySQL 8.4, `.env`의 DB 정보 사용)
+- 로컬 실행: `./gradlew bootRun` (기본 `local` 프로필, `.env`를 읽어 로컬 MySQL에 접속)
   - 8080 포트가 사용 중이면 `./gradlew bootRun --args='--server.port=8081'`
 - Swagger: `http://localhost:8080/swagger-ui/index.html`
 
@@ -56,7 +57,7 @@
 
 # 절대 금지
 - 운영 환경 DB·서버 접근 금지
-- 비밀번호, 키 등 민감 정보 커밋 금지 (`application.yaml`에 실제 값 하드코딩 금지, 환경변수 사용 / 목록은 `.env.example`)
+- 비밀번호, 키 등 민감 정보 커밋 금지 (`application.yaml`에 실제 값 하드코딩 금지, 환경변수 사용 / 로컬은 `.env.example`, 운영은 `.env.prod.example`)
 - `main`, `develop` 브랜치에 직접 커밋/푸시 금지 (항상 PR로 머지)
 - 요청하지 않은 의존성 추가, 패키지 구조 변경, 대규모 리팩토링 금지
 - 예상과 다른 연결/에러 발생 시 즉시 중단하고, 그 전에 실행한 작업까지 보고
