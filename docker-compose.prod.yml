@@ -1,6 +1,6 @@
 services:
   app:
-    image: ${DOCKERHUB_USERNAME}/sopkathon:latest
+    image: ${DOCKERHUB_USERNAME}/sopkathon:${IMAGE_TAG:-latest}
     container_name: sopkathon-app
     restart: unless-stopped
     env_file:
@@ -10,6 +10,12 @@ services:
       TZ: Asia/Seoul
     expose:
       - "8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
 
   nginx:
     image: nginx:1.27-alpine
@@ -24,7 +30,8 @@ services:
       - ./certbot/www:/var/www/certbot:ro
     command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"
     depends_on:
-      - app
+      app:
+        condition: service_healthy
 
   certbot:
     image: certbot/certbot:v5.8.0

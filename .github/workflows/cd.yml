@@ -3,6 +3,7 @@ name: CD
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,29 +17,30 @@ env:
 
 jobs:
   deploy:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
         with:
           distribution: temurin
           java-version: '21'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
 
       - name: Build jar
         run: ./gradlew bootJar
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build & Push image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: .
           push: true
@@ -54,18 +56,20 @@ jobs:
         run: |
           printf '%s\n' "$ENV_PROD" > .env
           printf 'DOCKERHUB_USERNAME=%s\n' "$DOCKERHUB_USERNAME" >> .env
+          printf 'IMAGE_TAG=%s\n' "$GITHUB_SHA" >> .env
 
       - name: Copy deploy files to EC2
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@917f8b81dfc1ccd331fef9e2d61bdc6c8be94634 # v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          fingerprint: ${{ secrets.EC2_SSH_FINGERPRINT }}
           source: "docker-compose.prod.yml,nginx/default.conf,.env"
           target: ~/sopkathon
 
       - name: Deploy on EC2
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/ssh-action@7eaf76671a0d7eec5d98ee897acda4f968735a17 # v1.2.0
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -73,13 +77,42 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          fingerprint: ${{ secrets.EC2_SSH_FINGERPRINT }}
           envs: DOCKERHUB_USERNAME,DOCKERHUB_TOKEN
           script: |
             set -e
             cd ~/sopkathon
             chmod 600 .env
+            compose() { docker compose -f docker-compose.prod.yml "$@"; }
+
             echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker compose -f docker-compose.prod.yml pull app
-            docker compose -f docker-compose.prod.yml up -d
-            docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload
-            docker image prune -f
+
+            # 롤백 대비: 현재 실행 중인 이미지를 previous 태그로 보관
+            HAS_PREV=false
+            if PREV_ID=$(docker inspect --format '{{.Image}}' sopkathon-app 2>/dev/null); then
+              docker tag "$PREV_ID" "$DOCKERHUB_USERNAME/sopkathon:previous"
+              HAS_PREV=true
+            fi
+
+            compose pull app
+
+            # 헬스체크(healthy)까지 대기, 실패 시 로그 출력 후 롤백
+            if compose up -d --wait --wait-timeout 180; then
+              compose exec -T nginx nginx -s reload
+              docker image prune -af
+              echo "배포 성공"
+            else
+              echo "헬스체크 실패: 앱 로그"
+              compose logs --tail 200 app || true
+              if [ "$HAS_PREV" = true ]; then
+                echo "이전 이미지로 롤백합니다."
+                sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=previous/' .env
+                if compose up -d --wait --wait-timeout 180 app; then
+                  compose exec -T nginx nginx -s reload
+                  echo "롤백 완료"
+                else
+                  echo "롤백 실패"
+                fi
+              fi
+              exit 1
+            fi
