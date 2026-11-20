@@ -2,17 +2,19 @@
 
 ## 🛠 Tech Stack
 - Java 21, Spring Boot 4.1.0
-- Spring Data JPA, MySQL (운영) / H2 (로컬·테스트)
+- Spring Data JPA, MySQL (로컬·운영) / H2 (테스트), Docker Compose (로컬 MySQL)
 - Lombok, springdoc-openapi (Swagger), Gradle
 
 ## 🚀 실행 방법
 ```bash
-./gradlew bootRun   # local 프로필, H2 인메모리 DB라 별도 설치 불필요
+cp .env.example .env   # DB 비밀번호 등 값 설정
+docker compose up -d   # 로컬 MySQL 실행
+./gradlew bootRun      # local 프로필, .env를 읽어 로컬 MySQL에 접속
 ./gradlew test      # 테스트
 ./gradlew build     # 빌드
 ```
 - Swagger: http://localhost:8080/swagger-ui/index.html
-- 운영 환경 변수 목록은 `.env.example` 참고
+- 로컬 환경 변수는 `.env.example`, 운영 환경 변수(`ENV_PROD` 시크릿)는 `.env.prod.example` 참고
 
 ## 📁 패키지 구조
 ```
