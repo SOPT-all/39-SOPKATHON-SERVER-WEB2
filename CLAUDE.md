@@ -12,7 +12,10 @@
 - Swagger: `http://localhost:8080/swagger-ui/index.html`
 
 # 규칙
-- 브랜치: `타입/#이슈번호/작업내용` (예: `feat/#1/common-response`), 작업내용은 영어 kebab-case, `main`에서 분기, `develop` 없음
+- 브랜치: `타입/#이슈번호/작업내용` (예: `feat/#1/common-response`), 작업내용은 영어 kebab-case
+  - `main`: 배포 브랜치 / `develop`: 개발 통합 브랜치
+  - 작업 브랜치는 `develop`에서 분기하고 PR은 `develop`으로 머지
+  - `develop`에서 동작 테스트 후 `develop` → `main` PR로 배포
 - 커밋/PR 제목: `타입: 작업 내용` (feat, fix, refactor, docs, test, build, chore)
 - 이슈 제목: `[타입] 작업 내용` (예: `[FEAT] 공통 응답 형식 및 전역 예외처리 추가`)
 - 응답은 `global/response`의 `BaseResponse`, 예외는 `global/exception`의 `BaseException`으로 처리
@@ -54,6 +57,6 @@
 # 절대 금지
 - 운영 환경 DB·서버 접근 금지
 - 비밀번호, 키 등 민감 정보 커밋 금지 (`application.yaml`에 실제 값 하드코딩 금지, 환경변수 사용 / 목록은 `.env.example`)
-- `main` 브랜치에 직접 커밋/푸시 금지
+- `main`, `develop` 브랜치에 직접 커밋/푸시 금지 (항상 PR로 머지)
 - 요청하지 않은 의존성 추가, 패키지 구조 변경, 대규모 리팩토링 금지
 - 예상과 다른 연결/에러 발생 시 즉시 중단하고, 그 전에 실행한 작업까지 보고
