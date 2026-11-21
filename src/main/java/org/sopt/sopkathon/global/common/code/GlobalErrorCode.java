@@ -60,6 +60,12 @@ public enum GlobalErrorCode implements ErrorCode {
       "GLB-E009",
       HttpStatus.CONFLICT,
       "이미 처리된 요청입니다."
+  ),
+
+  UNSUPPORTED_MEDIA_TYPE(
+      "GLB-E010",
+      HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+      "지원하지 않는 Content-Type입니다."
   );
 
   private final String code;

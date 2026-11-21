@@ -12,6 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -219,6 +220,23 @@ public class GlobalExceptionHandler {
         e.getSupportedHttpMethods()
     );
     return errorResponse(GlobalErrorCode.METHOD_NOT_ALLOWED);
+  }
+
+  /** Content-Type 헤더가 없거나 지원하지 않는 형식(예: JSON API에 text/plain)으로 요청한 경우. */
+  @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+  public ResponseEntity<BaseResponse<Void>> handleHttpMediaTypeNotSupported(
+      HttpMediaTypeNotSupportedException e,
+      HttpServletRequest request
+  ) {
+
+    log.warn(
+        "[HttpMediaTypeNotSupportedException] {} {} → contentType={}, supported={}",
+        request.getMethod(),
+        request.getRequestURI(),
+        e.getContentType(),
+        e.getSupportedMediaTypes()
+    );
+    return errorResponse(GlobalErrorCode.UNSUPPORTED_MEDIA_TYPE);
   }
 
   @ExceptionHandler(MaxUploadSizeExceededException.class)
