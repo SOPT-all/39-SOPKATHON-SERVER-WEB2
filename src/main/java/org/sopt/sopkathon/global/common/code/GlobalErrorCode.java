@@ -54,6 +54,12 @@ public enum GlobalErrorCode implements ErrorCode {
       "GLB-E008",
       HttpStatus.CONTENT_TOO_LARGE,
       "요청 크기가 허용 범위를 초과했습니다."
+  ),
+
+  DUPLICATE_RESOURCE(
+      "GLB-E009",
+      HttpStatus.CONFLICT,
+      "이미 처리된 요청입니다."
   );
 
   private final String code;
