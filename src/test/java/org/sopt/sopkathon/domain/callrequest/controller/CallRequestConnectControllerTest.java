@@ -93,7 +93,7 @@ class CallRequestConnectControllerTest {
   void 존재하지_않는_요청이면_404() throws Exception {
     connect(receiver.getId(), 999_999L)
         .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.code").value("REQ-E001"));
+        .andExpect(jsonPath("$.code").value("REQ-E005"));
   }
 
   @Test
