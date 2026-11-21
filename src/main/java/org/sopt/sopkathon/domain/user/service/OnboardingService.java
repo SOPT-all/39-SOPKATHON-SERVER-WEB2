@@ -35,14 +35,7 @@ public class OnboardingService {
     String profileImageUrl = s3ImageService.upload(profileImage, ImageDirectory.PROFILE);
 
     // DB 저장이 실패하면 업로드한 사진이 S3에 남는다. 해커톤 범위에서는 정리하지 않는다.
-    User onboarded = userService.completeOnboarding(
-        userId,
-        request.nickname(),
-        request.genderAsEnum(),
-        request.age(),
-        profileImageUrl,
-        request.scaledLatitude(),
-        request.scaledLongitude());
+    User onboarded = userService.completeOnboarding(userId, request.toProfile(profileImageUrl));
     return OnboardingResponse.from(onboarded);
   }
 }

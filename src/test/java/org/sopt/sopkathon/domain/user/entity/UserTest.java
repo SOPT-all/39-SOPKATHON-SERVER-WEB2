@@ -41,24 +41,20 @@ class UserTest {
   void 온보딩을_완료하면_정보가_저장되고_완료_상태가_된다() {
     User user = User.create("01012345678");
 
-    user.completeOnboarding(
-        "정우", Gender.MALE, 25, "https://example.com/a.jpg",
-        new BigDecimal("37.551234"), new BigDecimal("126.923456"));
+    user.completeOnboarding(profile("정우").build());
 
     assertThat(user.isOnboarded()).isTrue();
     assertThat(user.hasLocation()).isTrue();
+    assertThat(user.getLatitude()).isEqualByComparingTo("37.551234");
+    assertThat(user.getLongitude()).isEqualByComparingTo("126.923456");
   }
 
   @Test
   void 이미_온보딩한_유저는_다시_온보딩할_수_없다() {
     User user = User.create("01012345678");
-    user.completeOnboarding(
-        "정우", Gender.MALE, 25, "https://example.com/a.jpg",
-        new BigDecimal("37.551234"), new BigDecimal("126.923456"));
+    user.completeOnboarding(profile("정우").build());
 
-    assertThatThrownBy(() -> user.completeOnboarding(
-            "다른이름", Gender.FEMALE, 30, "https://example.com/b.jpg",
-            new BigDecimal("37.0"), new BigDecimal("127.0")))
+    assertThatThrownBy(() -> user.completeOnboarding(profile("다른이름").build()))
         .isInstanceOf(BaseException.class)
         .extracting("errorCode")
         .isEqualTo(UserErrorCode.ALREADY_ONBOARDED);
@@ -66,12 +62,19 @@ class UserTest {
   }
 
   @Test
-  void 좌표가_없으면_온보딩할_수_없다() {
-    User user = User.create("01012345678");
+  void 좌표가_없으면_온보딩_정보를_만들_수_없다() {
+    assertThatThrownBy(() -> profile("정우").latitude(null).build())
+        .isInstanceOf(NullPointerException.class)
+        .hasMessage("latitude");
+  }
 
-    assertThatThrownBy(() -> user.completeOnboarding(
-            "정우", Gender.MALE, 25, "https://example.com/a.jpg", null, new BigDecimal("126.9")))
-        .isInstanceOf(NullPointerException.class);
-    assertThat(user.isOnboarded()).isFalse();
+  private OnboardingProfile.OnboardingProfileBuilder profile(String nickname) {
+    return OnboardingProfile.builder()
+        .nickname(nickname)
+        .gender(Gender.MALE)
+        .age(25)
+        .profileImageUrl("https://example.com/a.jpg")
+        .latitude(new BigDecimal("37.551234"))
+        .longitude(new BigDecimal("126.923456"));
   }
 }

@@ -11,7 +11,6 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -92,33 +91,19 @@ public class User extends BaseEntity {
   }
 
   /**
-   * 온보딩 정보를 저장하고 완료 처리한다. 모든 값이 필수이며, 이미 온보딩한 회원은 다시 할 수 없다.
-   *
-   * <p>좌표가 비어 있는 회원이 생기면 매칭·근처 장소의 거리 계산이 실패하므로 null을 허용하지 않는다.
+   * 온보딩 정보를 저장하고 완료 처리한다. 이미 온보딩한 회원은 다시 할 수 없다. 값의 필수 여부는 {@link OnboardingProfile}이
+   * 보장한다.
    */
-  public void completeOnboarding(
-      String nickname,
-      Gender gender,
-      Integer age,
-      String profileImageUrl,
-      BigDecimal latitude,
-      BigDecimal longitude) {
+  public void completeOnboarding(OnboardingProfile profile) {
     if (isOnboarded()) {
       throw new BaseException(UserErrorCode.ALREADY_ONBOARDED);
     }
-    Objects.requireNonNull(nickname, "nickname");
-    Objects.requireNonNull(gender, "gender");
-    Objects.requireNonNull(age, "age");
-    Objects.requireNonNull(profileImageUrl, "profileImageUrl");
-    Objects.requireNonNull(latitude, "latitude");
-    Objects.requireNonNull(longitude, "longitude");
-
-    this.nickname = nickname;
-    this.gender = gender;
-    this.age = age;
-    this.profileImageUrl = profileImageUrl;
-    this.latitude = latitude;
-    this.longitude = longitude;
+    this.nickname = profile.nickname();
+    this.gender = profile.gender();
+    this.age = profile.age();
+    this.profileImageUrl = profile.profileImageUrl();
+    this.latitude = profile.latitude();
+    this.longitude = profile.longitude();
     this.onboardedAt = LocalDateTime.now();
   }
 }

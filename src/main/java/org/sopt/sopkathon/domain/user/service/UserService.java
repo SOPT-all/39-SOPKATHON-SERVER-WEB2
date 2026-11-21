@@ -1,11 +1,11 @@
 package org.sopt.sopkathon.domain.user.service;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.sopkathon.domain.user.code.UserErrorCode;
 import org.sopt.sopkathon.domain.user.entity.Gender;
+import org.sopt.sopkathon.domain.user.entity.OnboardingProfile;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.repository.UserRepository;
 import org.sopt.sopkathon.global.exception.BaseException;
@@ -41,18 +41,11 @@ public class UserService {
    * 409로 실패한다.
    */
   @Transactional
-  public User completeOnboarding(
-      Long userId,
-      String nickname,
-      Gender gender,
-      Integer age,
-      String profileImageUrl,
-      BigDecimal latitude,
-      BigDecimal longitude) {
+  public User completeOnboarding(Long userId, OnboardingProfile profile) {
     User user = userRepository
         .findByIdForUpdate(userId)
         .orElseThrow(() -> new BaseException(UserErrorCode.USER_NOT_FOUND));
-    user.completeOnboarding(nickname, gender, age, profileImageUrl, latitude, longitude);
+    user.completeOnboarding(profile);
     return user;
   }
 

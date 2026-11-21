@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import org.sopt.sopkathon.domain.user.entity.Gender;
+import org.sopt.sopkathon.domain.user.entity.OnboardingProfile;
 
 /**
  * 온보딩 정보 (multipart의 {@code request} JSON 파트). 모든 값이 필수다.
@@ -56,15 +57,18 @@ public record OnboardingRequest(
     nickname = nickname == null ? null : nickname.strip();
   }
 
-  public Gender genderAsEnum() {
-    return Gender.valueOf(gender);
-  }
-
-  public BigDecimal scaledLatitude() {
-    return latitude.setScale(COORDINATE_SCALE, RoundingMode.HALF_UP);
-  }
-
-  public BigDecimal scaledLongitude() {
-    return longitude.setScale(COORDINATE_SCALE, RoundingMode.HALF_UP);
+  /**
+   * 저장할 온보딩 정보로 변환한다. 성별 문자열은 {@code @Pattern}으로 검증된 값이라는 전제이므로 {@code @Valid}를 거친 뒤에만
+   * 호출한다. 좌표는 DB 컬럼(scale 6)에 맞춰 반올림한다.
+   */
+  public OnboardingProfile toProfile(String profileImageUrl) {
+    return OnboardingProfile.builder()
+        .nickname(nickname)
+        .gender(Gender.valueOf(gender))
+        .age(age)
+        .profileImageUrl(profileImageUrl)
+        .latitude(latitude.setScale(COORDINATE_SCALE, RoundingMode.HALF_UP))
+        .longitude(longitude.setScale(COORDINATE_SCALE, RoundingMode.HALF_UP))
+        .build();
   }
 }

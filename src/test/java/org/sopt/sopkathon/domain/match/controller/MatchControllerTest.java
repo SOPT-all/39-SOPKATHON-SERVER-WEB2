@@ -15,6 +15,7 @@ import org.sopt.sopkathon.domain.callrequest.repository.CallRequestRepository;
 import org.sopt.sopkathon.domain.match.entity.MatchSkip;
 import org.sopt.sopkathon.domain.match.repository.MatchSkipRepository;
 import org.sopt.sopkathon.domain.user.entity.Gender;
+import org.sopt.sopkathon.domain.user.entity.OnboardingProfile;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,13 +166,14 @@ class MatchControllerTest {
   private User onboardedUser(
       String phoneNumber, String nickname, Gender gender, String latitude, String longitude) {
     User user = User.create(phoneNumber);
-    user.completeOnboarding(
-        nickname,
-        gender,
-        30,
-        "https://example.com/" + phoneNumber + ".jpg",
-        new BigDecimal(latitude),
-        new BigDecimal(longitude));
+    user.completeOnboarding(OnboardingProfile.builder()
+        .nickname(nickname)
+        .gender(gender)
+        .age(30)
+        .profileImageUrl("https://example.com/" + phoneNumber + ".jpg")
+        .latitude(new BigDecimal(latitude))
+        .longitude(new BigDecimal(longitude))
+        .build());
     return userRepository.save(user);
   }
 
