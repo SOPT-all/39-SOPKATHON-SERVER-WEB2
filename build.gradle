@@ -43,4 +43,9 @@ tasks.named('jar') {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	// 환경 변수(SPRING_DATASOURCE_URL 등)는 application-test.yaml보다 우선한다.
+	// 운영 값이 있는 환경에서 테스트를 돌려도 create-drop이 실제 DB에 실행되지 않도록 H2 인메모리로 고정한다.
+	// (시스템 프로퍼티는 환경 변수보다 우선)
+	systemProperty 'spring.datasource.url', 'jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1'
+	systemProperty 'spring.datasource.driver-class-name', 'org.h2.Driver'
 }
