@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.sopt.sopkathon.global.common.code.ErrorCode;
 import org.sopt.sopkathon.global.common.code.GlobalErrorCode;
 import org.sopt.sopkathon.global.response.BaseResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -235,6 +236,25 @@ public class GlobalExceptionHandler {
     return errorResponse(GlobalErrorCode.PAYLOAD_TOO_LARGE);
   }
 
+  /**
+   * 유니크 제약 위반 등 DB 무결성 위반. 중복 클릭처럼 동시에 같은 요청이 들어와 exists 체크를 둘 다 통과한 경우
+   * DB 제약이 막아주므로 500 대신 409로 응답한다. 원인 메시지에는 중복된 값(전화번호 등)이 담길 수 있어 로그에 남기지 않는다.
+   */
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<BaseResponse<Void>> handleDataIntegrityViolation(
+      DataIntegrityViolationException e,
+      HttpServletRequest request
+  ) {
+
+    log.warn(
+        "[DataIntegrityViolationException] {} {} → constraint={}",
+        request.getMethod(),
+        request.getRequestURI(),
+        constraintName(e)
+    );
+    return errorResponse(GlobalErrorCode.DUPLICATE_RESOURCE);
+  }
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<BaseResponse<Void>> handleException(
       Exception e,
@@ -251,7 +271,18 @@ public class GlobalExceptionHandler {
     return errorResponse(GlobalErrorCode.INTERNAL_SERVER_ERROR);
   }
 
-  private ResponseEntity<BaseResponse<Void>> errorResponse(
+  private String constraintName(DataIntegrityViolationException e) {
+    Throwable cause = e;
+    while (cause != null) {
+      if (cause instanceof org.hibernate.exception.ConstraintViolationException hibernateException) {
+        return hibernateException.getConstraintName();
+      }
+      cause = cause.getCause();
+    }
+    return "unknown";
+  }
+
+    private ResponseEntity<BaseResponse<Void>> errorResponse(
       ErrorCode errorCode
   ) {
 
