@@ -203,19 +203,18 @@ public interface CallRequestApi {
   @Operation(
       summary = "전화 완료",
       description = """
-          받은 요청 → 전화 걸기 → "통화하셨나요?"에서 **예**를 누르면 호출합니다. 요청이 **통화 완료(CONNECTED)** 로 바뀝니다.
+          받은 요청 → 전화 걸기 → "통화하셨나요?"에서 **예**를 누르면 호출합니다. 요청이 **통화 완료(CONNECTED)** 로 바뀝니다. Body는 없습니다.
 
           ### 호출 규칙
-          **아니요**를 누르면 호출하지 않습니다 (PENDING 유지).
+          **아니요**면 호출하지 않습니다 (PENDING 유지). 이미 통화한 상대에게 다시 전화할 때는 호출하지 않아도 되고, 여러 번 호출해도 **200**입니다.
 
-          이미 통화한 상대에게 다시 전화한 경우 호출하지 않아도 되고, 호출해도 **200**입니다.
-
-          **요청을 받은 사람만** 호출할 수 있습니다.
+          ### 응답 처리
+          성공하면 목록에서 그 요청만 통화 완료로 바꿔 보여주면 됩니다 (목록 재조회 불필요). 내가 받은 요청이 아니면 **403이 아니라 404**입니다.
           """)
   @ApiResponses({
       @ApiResponse(
           responseCode = "200",
-          description = "통화 완료 처리 (이미 완료된 요청 포함)",
+          description = "통화 완료 처리 (이미 완료된 요청 포함) → 목록에서 그 요청만 CONNECTED로 변경",
           content = @Content(
               mediaType = "application/json",
               examples = @ExampleObject(
@@ -243,7 +242,7 @@ public interface CallRequestApi {
                       """))),
       @ApiResponse(
           responseCode = "404",
-          description = "존재하지 않거나 내가 받은 요청이 아님 (보낸 사람·다른 회원이 호출)",
+          description = "존재하지 않거나 내가 받은 요청이 아님 (보낸 사람·다른 회원이 호출) → 목록 새로고침",
           content = @Content(
               mediaType = "application/json",
               examples = @ExampleObject(

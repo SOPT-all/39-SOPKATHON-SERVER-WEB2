@@ -7,7 +7,7 @@ import org.sopt.sopkathon.domain.callrequest.entity.CallRequestStatus;
 @Schema(description = "전화 완료 결과")
 public record CallRequestConnectResponse(
     @Schema(description = "처리한 요청 ID", example = "15") Long requestId,
-    @Schema(description = "변경 후 상태. 항상 CONNECTED", example = "CONNECTED") CallRequestStatus status) {
+    @Schema(description = "변경 후 상태. 항상 CONNECTED (PENDING: 통화 전, CONNECTED: 통화 완료)", example = "CONNECTED") CallRequestStatus status) {
 
   public static CallRequestConnectResponse from(CallRequest callRequest) {
     return new CallRequestConnectResponse(callRequest.getId(), callRequest.getStatus());
