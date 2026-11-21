@@ -11,10 +11,13 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.sopt.sopkathon.domain.user.code.UserErrorCode;
 import org.sopt.sopkathon.global.common.entity.BaseEntity;
+import org.sopt.sopkathon.global.exception.BaseException;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,6 +26,9 @@ import org.sopt.sopkathon.global.common.entity.BaseEntity;
     name = "users",
     indexes = @Index(name = "idx_users_location", columnList = "latitude, longitude"))
 public class User extends BaseEntity {
+
+  /** 하이픈 등을 제거한 휴대폰 번호 (010xxxxxxxx, 011xxxxxxx 등) */
+  private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile("^01\\d{8,9}$");
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,7 +66,19 @@ public class User extends BaseEntity {
   }
 
   public static User create(String phoneNumber) {
-    return new User(phoneNumber);
+    return new User(normalizePhoneNumber(phoneNumber));
+  }
+
+  /**
+   * 숫자만 남겨 저장 형식을 통일한다. 010-1234-5678과 01012345678이 같은 유저로 취급되도록, 저장뿐 아니라 조회
+   * ({@code findByPhoneNumber})할 때도 이 메서드를 거친 값을 사용한다.
+   */
+  public static String normalizePhoneNumber(String phoneNumber) {
+    String digits = phoneNumber == null ? "" : phoneNumber.replaceAll("\\D", "");
+    if (!PHONE_NUMBER_PATTERN.matcher(digits).matches()) {
+      throw new BaseException(UserErrorCode.INVALID_PHONE_NUMBER);
+    }
+    return digits;
   }
 
   public boolean isOnboarded() {
