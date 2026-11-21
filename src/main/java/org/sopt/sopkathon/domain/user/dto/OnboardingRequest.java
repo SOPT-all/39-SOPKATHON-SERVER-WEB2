@@ -21,7 +21,7 @@ import org.sopt.sopkathon.domain.user.entity.OnboardingProfile;
  */
 @Schema(description = "온보딩 정보 (모든 값 필수)")
 public record OnboardingRequest(
-    @Schema(description = "이름(닉네임). 앞뒤 공백 제외 1 ~ 10자", example = "정우")
+    @Schema(description = "이름(닉네임). 앞뒤 공백 제외 1 ~ 10자", example = "순자")
     @NotBlank(message = "이름을 입력해주세요.")
     @Size(max = 10, message = "이름은 10자 이하여야 합니다.")
     String nickname,
@@ -32,7 +32,7 @@ public record OnboardingRequest(
     @Pattern(regexp = "MALE|FEMALE", message = "성별은 MALE 또는 FEMALE이어야 합니다.")
     String gender,
 
-    @Schema(description = "나이 (1 ~ 120)", example = "25")
+    @Schema(description = "나이 (1 ~ 120)", example = "65")
     @NotNull(message = "나이를 입력해주세요.")
     @Min(value = 1, message = "나이는 1 이상 120 이하여야 합니다.")
     @Max(value = 120, message = "나이는 1 이상 120 이하여야 합니다.")

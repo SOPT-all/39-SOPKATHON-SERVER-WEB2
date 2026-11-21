@@ -22,31 +22,48 @@ public interface UserApi {
   @Operation(
       summary = "온보딩",
       description = """
-          온보딩(S-002)에서 셀카, 이름, 성별, 나이, 위치를 한 번에 저장하고 온보딩을 완료합니다.
-          사진은 S3에 올라가고 URL이 저장됩니다. **모든 값이 필수**입니다.
+          온보딩(S-002)에서 셀카, 이름, 성별, 나이, 위치를 **한 번에** 저장하고 온보딩을 완료합니다. **모든 값이 필수**입니다.
+          로그인 응답이 onboarded: false일 때 이 화면으로 오고, 성공하면 매칭 화면(S-003)으로 이동합니다.
 
-          **요청 형식**
+          **보내는 방법 (꼭 읽어주세요)**
 
-          ① multipart/form-data로 **profileImage**(파일)와 **request**(JSON) 두 파트를 보냅니다.
+          ① FormData에 **profileImage**(셀카 파일)와 **request**(나머지 정보 JSON) 두 파트를 담아 보냅니다.
 
-          ② request 파트는 반드시 Content-Type을 application/json으로 지정해야 합니다. FormData에 문자열로 그냥 넣으면 text/plain이 되어 415가 납니다. Blob에 type: "application/json"을 지정해 주세요.
+          ② request 파트는 반드시 **Blob에 type: "application/json"** 을 지정해서 넣습니다. 문자열로 그냥 append하면 서버가 읽지 못해 **415**가 납니다.
 
-          ③ 요청 전체의 Content-Type은 직접 넣지 않습니다. 브라우저가 boundary와 함께 자동으로 설정합니다.
+          ③ 요청 헤더에 Content-Type을 **직접 넣지 않습니다.** 직접 넣으면 boundary가 빠져서 요청이 깨집니다. 브라우저가 자동으로 넣게 두세요. (axios도 동일)
 
-          **입력 규칙**
+          **request (JSON) 입력 규칙**
 
-          ① 이름은 앞뒤 공백을 뺀 1 ~ 10자이고, 저장할 때 앞뒤 공백을 제거합니다.
+          ① nickname: 앞뒤 공백을 뺀 **1 ~ 10자**. 앞뒤 공백은 서버가 지우고 저장합니다.
 
-          ② 성별은 MALE 또는 FEMALE, 나이는 1 ~ 120입니다.
+          ② gender: MALE 또는 FEMALE / age: **1 ~ 120** 정수
 
-          ③ 위도는 -90 ~ 90, 경도는 -180 ~ 180이고 소수점 6자리까지 저장합니다. 위치 권한을 거부하면 좌표가 없으므로 온보딩할 수 없습니다.
+          ③ latitude: -90 ~ 90 / longitude: -180 ~ 180. 소수점 6자리까지 저장되며 navigator.geolocation 값을 그대로 보내면 됩니다.
 
-          ④ 사진은 jpg, jpeg, png, webp만 가능하고 최대 5MB입니다.
+          ④ **위치 권한을 거부하면 좌표가 없으므로 "시작하기" 버튼을 비활성화**해 주세요.
 
-          **응답**
+          **profileImage (파일) 규칙**
 
-          이미 있는 회원 정보를 채우는 것이라 200으로 응답합니다. 성공하면 매칭 화면(S-003)으로 이동합니다.
-          좌표와 전화번호는 응답에 포함하지 않습니다. 이미 온보딩한 회원은 다시 할 수 없습니다(409).
+          ① 형식은 **jpg, jpeg, png, webp**, 크기는 **최대 5MB**입니다.
+
+          ② 파일 이름의 확장자, 파일 타입, **실제 파일 내용**이 모두 같은 형식이어야 합니다. 확장자만 바꾼 파일(png를 .jpg로 이름만 변경 등)은 거절됩니다.
+
+          ③ gif, heic(아이폰 원본)는 지원하지 않습니다. 필요하면 프론트에서 jpg로 변환하고, 5MB가 넘는 사진은 업로드 전에 리사이즈·압축해 주세요.
+
+          **응답과 에러 처리**
+
+          ① 200 응답에는 저장된 정보와 셀카 URL이 담깁니다. 위치와 전화번호는 응답에 없습니다.
+
+          ② 입력값 규칙 위반은 400 GLB-E001이고, **data에 필드 이름별 메시지**가 담깁니다. 해당 입력란 아래에 그대로 보여주면 됩니다.
+
+          ③ 409 USR-E004(이미 온보딩함)는 매칭 화면으로, 404 USR-E002(없는 회원)는 로그인 화면으로 이동하면 됩니다.
+
+          ④ 에러 분기는 HTTP 상태보다 **code 값으로** 하는 것을 권장합니다.
+
+          **참고**
+
+          온보딩은 **한 번만** 할 수 있고 프로필 수정 기능은 없습니다. "시작하기"를 여러 번 눌러도 한 번만 저장되고 나머지 요청은 409로 응답하니, 전송 중에는 버튼을 비활성화해 주세요.
           """)
   // request 파트를 application/json으로 보내도록 지정 (없으면 Swagger UI가 text/plain으로 보내 415가 남)
   @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -67,9 +84,9 @@ public interface UserApi {
                         "message": "요청이 성공했습니다.",
                         "data": {
                           "userId": 1,
-                          "nickname": "정우",
+                          "nickname": "순자",
                           "gender": "MALE",
-                          "age": 25,
+                          "age": 65,
                           "profileImageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/0566e0e8-0ff5-4623-b11a-f8ed61040320.jpg"
                         }
                       }
@@ -81,7 +98,7 @@ public interface UserApi {
               mediaType = "application/json",
               examples = {
                   @ExampleObject(
-                      name = "GLB-E001 필드 검증 실패",
+                      name = "GLB-E001 입력값 규칙 위반 (data에 필드별 메시지)",
                       value = """
                           {
                             "success": false,
@@ -89,12 +106,12 @@ public interface UserApi {
                             "message": "잘못된 요청입니다.",
                             "data": {
                               "nickname": "이름은 10자 이하여야 합니다.",
-                              "gender": "성별은 MALE 또는 FEMALE이어야 합니다."
+                              "age": "나이는 1 이상 120 이하여야 합니다."
                             }
                           }
                           """),
                   @ExampleObject(
-                      name = "GLB-E001 파트·헤더 누락, JSON 형식 오류",
+                      name = "GLB-E001 파트·헤더 누락, JSON 형식 오류 (개발 중에만 발생)",
                       value = """
                           {
                             "success": false,
@@ -103,7 +120,7 @@ public interface UserApi {
                           }
                           """),
                   @ExampleObject(
-                      name = "IMG-E001 빈 사진 파일",
+                      name = "IMG-E001 빈 사진 파일 → 사진을 다시 선택해주세요",
                       value = """
                           {
                             "success": false,
@@ -112,7 +129,7 @@ public interface UserApi {
                           }
                           """),
                   @ExampleObject(
-                      name = "IMG-E002 지원하지 않는 이미지 형식",
+                      name = "IMG-E002 지원하지 않는 형식 (확장자·타입·파일 내용 불일치 포함)",
                       value = """
                           {
                             "success": false,
@@ -123,7 +140,7 @@ public interface UserApi {
               })),
       @ApiResponse(
           responseCode = "404",
-          description = "존재하지 않는 유저",
+          description = "존재하지 않는 회원 → 로그인 화면으로 이동",
           content = @Content(
               mediaType = "application/json",
               examples = @ExampleObject(
@@ -137,7 +154,7 @@ public interface UserApi {
                       """))),
       @ApiResponse(
           responseCode = "409",
-          description = "이미 온보딩을 완료한 유저",
+          description = "이미 온보딩을 완료한 회원 → 매칭 화면으로 이동",
           content = @Content(
               mediaType = "application/json",
               examples = @ExampleObject(
@@ -151,7 +168,7 @@ public interface UserApi {
                       """))),
       @ApiResponse(
           responseCode = "413",
-          description = "사진 5MB 초과 또는 요청 전체 8MB 초과",
+          description = "사진 5MB 초과 → 5MB 이하 사진을 올려주세요",
           content = @Content(
               mediaType = "application/json",
               examples = @ExampleObject(
@@ -165,7 +182,7 @@ public interface UserApi {
                       """))),
       @ApiResponse(
           responseCode = "415",
-          description = "요청이 multipart/form-data가 아니거나 request 파트가 application/json이 아님",
+          description = "request 파트에 application/json을 지정하지 않음 (개발 중에만 발생)",
           content = @Content(
               mediaType = "application/json",
               examples = @ExampleObject(
