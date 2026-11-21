@@ -5,13 +5,20 @@ import java.util.List;
 import java.util.Optional;
 import org.sopt.sopkathon.domain.user.entity.Gender;
 import org.sopt.sopkathon.domain.user.entity.User;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
   Optional<User> findByPhoneNumber(String phoneNumber);
+
+  /** 비관적 쓰기 락(SELECT ... FOR UPDATE)으로 조회한다. 같은 회원의 동시 온보딩을 한 번만 성공시키기 위해 사용한다. */
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select u from User u where u.id = :userId")
+  Optional<User> findByIdForUpdate(@Param("userId") Long userId);
 
   /**
    * 온보딩을 마치고 좌표가 있는 회원 중 해당 성별인 회원을 조회한다. excludedIds에 담긴 회원은 제외한다. excludedIds는 비어 있으면

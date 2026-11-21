@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -254,6 +255,22 @@ public class GlobalExceptionHandler {
         e.getSupportedMediaTypes()
     );
     return errorResponse(GlobalErrorCode.UNSUPPORTED_MEDIA_TYPE);
+  }
+
+  /** multipart 요청에서 필수 파트(파일, JSON 등) 누락 */
+  @ExceptionHandler(MissingServletRequestPartException.class)
+  public ResponseEntity<BaseResponse<Void>> handleMissingServletRequestPart(
+      MissingServletRequestPartException e,
+      HttpServletRequest request
+  ) {
+
+    log.warn(
+        "[MissingServletRequestPartException] {} {} → partName={}",
+        request.getMethod(),
+        request.getRequestURI(),
+        e.getRequestPartName()
+    );
+    return errorResponse(GlobalErrorCode.INVALID_REQUEST);
   }
 
   @ExceptionHandler(MaxUploadSizeExceededException.class)

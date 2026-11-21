@@ -1,5 +1,6 @@
 package org.sopt.sopkathon.domain.user.service;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,26 @@ public class UserService {
     return userRepository
         .findById(userId)
         .orElseThrow(() -> new BaseException(UserErrorCode.USER_NOT_FOUND));
+  }
+
+  /**
+   * 온보딩 정보를 저장한다. 같은 회원이 동시에 요청해도 락으로 순서대로 처리되어, 두 번째 요청은 이미 온보딩한 상태를 보고
+   * 409로 실패한다.
+   */
+  @Transactional
+  public User completeOnboarding(
+      Long userId,
+      String nickname,
+      Gender gender,
+      Integer age,
+      String profileImageUrl,
+      BigDecimal latitude,
+      BigDecimal longitude) {
+    User user = userRepository
+        .findByIdForUpdate(userId)
+        .orElseThrow(() -> new BaseException(UserErrorCode.USER_NOT_FOUND));
+    user.completeOnboarding(nickname, gender, age, profileImageUrl, latitude, longitude);
+    return user;
   }
 
   /** 위치·성별 등 온보딩 정보가 필요한 기능에서 사용한다. 좌표가 없으면 온보딩을 마치지 않은 것으로 본다. */

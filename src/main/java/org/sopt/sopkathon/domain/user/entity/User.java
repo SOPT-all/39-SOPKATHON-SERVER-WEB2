@@ -11,6 +11,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -90,6 +91,11 @@ public class User extends BaseEntity {
     return latitude != null && longitude != null;
   }
 
+  /**
+   * 온보딩 정보를 저장하고 완료 처리한다. 모든 값이 필수이며, 이미 온보딩한 회원은 다시 할 수 없다.
+   *
+   * <p>좌표가 비어 있는 회원이 생기면 매칭·근처 장소의 거리 계산이 실패하므로 null을 허용하지 않는다.
+   */
   public void completeOnboarding(
       String nickname,
       Gender gender,
@@ -97,6 +103,16 @@ public class User extends BaseEntity {
       String profileImageUrl,
       BigDecimal latitude,
       BigDecimal longitude) {
+    if (isOnboarded()) {
+      throw new BaseException(UserErrorCode.ALREADY_ONBOARDED);
+    }
+    Objects.requireNonNull(nickname, "nickname");
+    Objects.requireNonNull(gender, "gender");
+    Objects.requireNonNull(age, "age");
+    Objects.requireNonNull(profileImageUrl, "profileImageUrl");
+    Objects.requireNonNull(latitude, "latitude");
+    Objects.requireNonNull(longitude, "longitude");
+
     this.nickname = nickname;
     this.gender = gender;
     this.age = age;
