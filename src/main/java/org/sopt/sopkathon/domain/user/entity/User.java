@@ -14,11 +14,9 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.sopt.sopkathon.global.common.entity.BaseEntity;
 
 @Getter
-@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(
@@ -56,6 +54,14 @@ public class User extends BaseEntity {
   /** null이면 온보딩 미완료. */
   @Column(name = "onboarded_at")
   private LocalDateTime onboardedAt;
+
+  private User(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
+  }
+
+  public static User create(String phoneNumber) {
+    return new User(phoneNumber);
+  }
 
   public boolean isOnboarded() {
     return onboardedAt != null;

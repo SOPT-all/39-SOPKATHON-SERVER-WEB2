@@ -12,7 +12,6 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.sopt.sopkathon.domain.user.entity.User;
@@ -20,7 +19,6 @@ import org.sopt.sopkathon.global.common.entity.BaseEntity;
 
 /** "다음 사람 보기"로 넘긴 기록. 이미 본 사람을 다시 보여주지 않기 위해 사용한다. */
 @Getter
-@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(
@@ -46,4 +44,13 @@ public class MatchSkip extends BaseEntity {
   @JoinColumn(name = "target_id", nullable = false)
   @OnDelete(action = OnDeleteAction.CASCADE)
   private User target;
+
+  private MatchSkip(User user, User target) {
+    this.user = user;
+    this.target = target;
+  }
+
+  public static MatchSkip create(User user, User target) {
+    return new MatchSkip(user, target);
+  }
 }

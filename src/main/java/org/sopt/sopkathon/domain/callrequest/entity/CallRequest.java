@@ -15,17 +15,14 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.global.common.entity.BaseEntity;
 
 @Getter
-@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(
@@ -57,7 +54,6 @@ public class CallRequest extends BaseEntity {
   @Column(length = 100)
   private String message;
 
-  @Builder.Default
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
   private CallRequestStatus status = CallRequestStatus.PENDING;
@@ -69,6 +65,16 @@ public class CallRequest extends BaseEntity {
   /** "통화하셨나요?"에서 예를 누른 시각 */
   @Column(name = "connected_at")
   private LocalDateTime connectedAt;
+
+  private CallRequest(User requester, User receiver, String message) {
+    this.requester = requester;
+    this.receiver = receiver;
+    this.message = message;
+  }
+
+  public static CallRequest create(User requester, User receiver, String message) {
+    return new CallRequest(requester, receiver, message);
+  }
 
   public void tapCall() {
     this.callTappedAt = LocalDateTime.now();

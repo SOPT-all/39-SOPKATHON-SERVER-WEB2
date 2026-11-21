@@ -12,12 +12,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.sopt.sopkathon.global.common.entity.BaseEntity;
 
 /** 운영자가 미리 등록한 제휴 장소. 사용자 등록 기능은 없다. */
 @Getter
-@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(
@@ -50,7 +48,25 @@ public class Place extends BaseEntity {
   @Column(name = "naver_map_url", length = 500)
   private String naverMapUrl;
 
-  @Builder.Default
   @Column(name = "is_active", nullable = false)
   private boolean active = true;
+
+  /** 필드가 많아 빌더로 생성한다. id와 active(기본 true)는 받지 않는다. */
+  @Builder
+  private Place(
+      String name,
+      String imageUrl,
+      String address,
+      BigDecimal latitude,
+      BigDecimal longitude,
+      String benefitText,
+      String naverMapUrl) {
+    this.name = name;
+    this.imageUrl = imageUrl;
+    this.address = address;
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.benefitText = benefitText;
+    this.naverMapUrl = naverMapUrl;
+  }
 }
