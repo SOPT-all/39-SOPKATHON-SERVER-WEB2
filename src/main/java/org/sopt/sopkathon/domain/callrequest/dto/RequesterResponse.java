@@ -15,9 +15,13 @@ public record RequesterResponse(
             example = "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/xxx.jpg")
         String profileImageUrl,
     @Schema(description = "전화번호. 하이픈 없이 숫자만", example = "01012345678") String phoneNumber,
-    @Schema(description = "나와의 직선 거리 (미터, 100m 단위로 올림)", example = "500") int distance) {
+    @Schema(
+            description = "나와의 직선 거리 (미터, 100m 단위로 올림). 보낸 사람의 좌표가 없으면 null",
+            example = "500",
+            nullable = true)
+        Integer distance) {
 
-  public static RequesterResponse from(User requester, int distance) {
+  public static RequesterResponse from(User requester, Integer distance) {
     return new RequesterResponse(
         requester.getId(),
         requester.getNickname(),

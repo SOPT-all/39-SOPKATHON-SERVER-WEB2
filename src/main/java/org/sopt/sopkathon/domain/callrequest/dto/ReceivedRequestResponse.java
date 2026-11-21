@@ -18,7 +18,7 @@ public record ReceivedRequestResponse(
         LocalDateTime createdAt,
     @Schema(description = "요청을 보낸 사람") RequesterResponse requester) {
 
-  public static ReceivedRequestResponse from(CallRequest callRequest, int distance) {
+  public static ReceivedRequestResponse from(CallRequest callRequest, Integer distance) {
     return new ReceivedRequestResponse(
         callRequest.getId(),
         callRequest.getStatus(),

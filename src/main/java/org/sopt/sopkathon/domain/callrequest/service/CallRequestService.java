@@ -74,7 +74,14 @@ public class CallRequestService {
     return callRequestRepository.findPartnerIds(userId);
   }
 
-  private int displayDistance(User me, User other) {
+  /**
+   * 내 좌표는 getOnboardedUser에서 보장된다. 보낸 사람은 정상 흐름에서 항상 좌표가 있지만, 없으면 요청을 숨기지 않고 거리만 null로
+   * 내린다 (받은 사람이 전화를 걸 수 있어야 하므로).
+   */
+  private Integer displayDistance(User me, User other) {
+    if (!other.hasLocation()) {
+      return null;
+    }
     return DistanceCalculator.toDisplayDistance(DistanceCalculator.distanceInMeters(
         me.getLatitude(), me.getLongitude(), other.getLatitude(), other.getLongitude()));
   }

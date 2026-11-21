@@ -124,6 +124,24 @@ class ReceivedCallRequestControllerTest {
   }
 
   @Test
+  void 보낸_사람의_좌표가_없어도_요청은_보이고_거리만_null이다() throws Exception {
+    CallRequest request = callRequestRepository.save(CallRequest.create(first, me, null));
+    entityManager.flush();
+    entityManager
+        .createNativeQuery("update users set latitude = null, longitude = null where id = :id")
+        .setParameter("id", first.getId())
+        .executeUpdate();
+    entityManager.clear();
+
+    getReceived(me.getId(), null)
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.requests[*].requestId").value(contains(request.getId().intValue())))
+        .andExpect(jsonPath("$.data.requests[0].requester.phoneNumber").value("01011111111"))
+        .andExpect(jsonPath("$.data.requests[0].requester", hasKey("distance")))
+        .andExpect(jsonPath("$.data.requests[0].requester.distance").value(nullValue()));
+  }
+
+  @Test
   void 받은_요청이_없으면_빈_목록을_200으로_준다() throws Exception {
     getReceived(me.getId(), null)
         .andExpect(status().isOk())
