@@ -79,6 +79,23 @@ class AuthControllerTest {
   }
 
   @Test
+  void Content_Type_없이_요청하면_500이_아니라_415를_응답한다() throws Exception {
+    mockMvc.perform(post("/api/v1/auth/login").content("{\"phoneNumber\": \"01012345678\"}"))
+        .andExpect(status().isUnsupportedMediaType())
+        .andExpect(jsonPath("$.code").value("GLB-E010"));
+  }
+
+  @Test
+  void JSON이_아닌_Content_Type으로_요청하면_415를_응답한다() throws Exception {
+    mockMvc.perform(
+            post("/api/v1/auth/login")
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("01012345678"))
+        .andExpect(status().isUnsupportedMediaType())
+        .andExpect(jsonPath("$.code").value("GLB-E010"));
+  }
+
+  @Test
   void 전화번호가_비어있으면_400을_응답한다() throws Exception {
     login(" ")
         .andExpect(status().isBadRequest())
