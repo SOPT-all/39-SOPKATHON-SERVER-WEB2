@@ -5,11 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.sopkathon.domain.callrequest.code.CallRequestErrorCode;
 import org.sopt.sopkathon.domain.callrequest.dto.CallRequestCreateRequest;
 import org.sopt.sopkathon.domain.callrequest.dto.CallRequestCreateResponse;
+import org.sopt.sopkathon.domain.callrequest.dto.ReceivedRequestListResponse;
+import org.sopt.sopkathon.domain.callrequest.dto.ReceivedRequestResponse;
 import org.sopt.sopkathon.domain.callrequest.entity.CallRequest;
+import org.sopt.sopkathon.domain.callrequest.entity.CallRequestStatus;
 import org.sopt.sopkathon.domain.callrequest.repository.CallRequestRepository;
 import org.sopt.sopkathon.domain.match.service.MatchSkipService;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.service.UserService;
+import org.sopt.sopkathon.global.common.util.DistanceCalculator;
 import org.sopt.sopkathon.global.exception.BaseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,8 +54,28 @@ public class CallRequestService {
     return CallRequestCreateResponse.from(saved);
   }
 
+  /** called가 null이면 전체, true면 통화 완료, false면 통화 전만 조회한다. 거리는 fetch join한 requester 좌표로 계산해 추가 쿼리가 없다. */
+  @Transactional(readOnly = true)
+  public ReceivedRequestListResponse getReceived(Long userId, Boolean called) {
+    User me = userService.getOnboardedUser(userId);
+    CallRequestStatus status =
+        called == null ? null : (called ? CallRequestStatus.CONNECTED : CallRequestStatus.PENDING);
+
+    List<ReceivedRequestResponse> requests =
+        callRequestRepository.findReceived(me.getId(), status).stream()
+            .map(callRequest -> ReceivedRequestResponse.from(
+                callRequest, displayDistance(me, callRequest.getRequester())))
+            .toList();
+    return ReceivedRequestListResponse.of(requests);
+  }
+
   @Transactional(readOnly = true)
   public List<Long> findPartnerIds(Long userId) {
     return callRequestRepository.findPartnerIds(userId);
+  }
+
+  private int displayDistance(User me, User other) {
+    return DistanceCalculator.toDisplayDistance(DistanceCalculator.distanceInMeters(
+        me.getLatitude(), me.getLongitude(), other.getLatitude(), other.getLongitude()));
   }
 }
