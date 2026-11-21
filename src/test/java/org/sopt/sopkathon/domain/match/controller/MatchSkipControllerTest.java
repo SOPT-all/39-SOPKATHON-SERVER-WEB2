@@ -44,26 +44,26 @@ class MatchSkipControllerTest {
   }
 
   @Test
-  void 상대를_넘기면_201과_함께_기록이_저장된다() throws Exception {
+  void 상대를_넘기면_200과_함께_기록이_저장된다() throws Exception {
     mockMvc
         .perform(post(SKIP_URL, target.getId()).header("X-User-Id", me.getId()))
-        .andExpect(status().isCreated())
+        .andExpect(status().isOk())
         .andExpect(jsonPath("$.success").value(true))
-        .andExpect(jsonPath("$.code").value("GLB-S002"))
+        .andExpect(jsonPath("$.code").value("GLB-S001"))
         .andExpect(jsonPath("$.data").doesNotExist());
 
     assertThat(matchSkipRepository.existsByUserIdAndTargetId(me.getId(), target.getId())).isTrue();
   }
 
   @Test
-  void 이미_넘긴_상대를_다시_넘겨도_201이고_기록은_하나다() throws Exception {
+  void 이미_넘긴_상대를_다시_넘겨도_200이고_기록은_하나다() throws Exception {
     mockMvc
         .perform(post(SKIP_URL, target.getId()).header("X-User-Id", me.getId()))
-        .andExpect(status().isCreated());
+        .andExpect(status().isOk());
     mockMvc
         .perform(post(SKIP_URL, target.getId()).header("X-User-Id", me.getId()))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.code").value("GLB-S002"));
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code").value("GLB-S001"));
 
     assertThat(matchSkipRepository.count()).isEqualTo(1);
   }
@@ -74,7 +74,7 @@ class MatchSkipControllerTest {
 
     mockMvc
         .perform(post(SKIP_URL, target.getId()).header("X-User-Id", me.getId()))
-        .andExpect(status().isCreated());
+        .andExpect(status().isOk());
 
     mockMvc
         .perform(get("/api/v1/matches").header("X-User-Id", me.getId()))

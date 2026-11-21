@@ -5,8 +5,6 @@ import org.sopt.sopkathon.domain.match.dto.MatchListResponse;
 import org.sopt.sopkathon.domain.match.service.MatchService;
 import org.sopt.sopkathon.global.common.code.GlobalSuccessCode;
 import org.sopt.sopkathon.global.response.BaseResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,12 +31,10 @@ public class MatchController implements MatchApi {
 
   @Override
   @PostMapping("/{targetId}/skip")
-  public ResponseEntity<BaseResponse<Void>> skip(
+  public BaseResponse<Void> skip(
       @RequestHeader("X-User-Id") Long userId,
       @PathVariable Long targetId) {
     matchService.skip(userId, targetId);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(BaseResponse.success(GlobalSuccessCode.CREATED));
+    return BaseResponse.success(GlobalSuccessCode.OK);
   }
 }

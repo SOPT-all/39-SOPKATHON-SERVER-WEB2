@@ -13,7 +13,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.sopt.sopkathon.domain.match.dto.MatchListResponse;
 import org.sopt.sopkathon.global.response.BaseResponse;
-import org.springframework.http.ResponseEntity;
 
 /** 파라미터 검증 제약(@Min, @Max)은 여기에만 선언한다. 구현 메서드에서는 제약을 추가할 수 없다. */
 @Tag(name = "Match", description = "매칭 상대 조회 · 넘기기")
@@ -198,23 +197,23 @@ public interface MatchApi {
 
           **중복 처리**
 
-          ① 이미 넘긴 상대를 다시 넘겨도 에러 없이 201로 응답하고, 기록은 한 번만 남습니다.
+          ① 이미 넘긴 상대를 다시 넘겨도 에러 없이 200으로 응답하고, 기록은 한 번만 남습니다.
 
           ② 같은 요청이 동시에 들어와 409(GLB-E009)가 오면 이미 넘긴 것이므로 성공으로 처리해 주세요.
           """)
   @ApiResponses({
       @ApiResponse(
-          responseCode = "201",
+          responseCode = "200",
           description = "넘기기 성공 (이미 넘긴 상대 포함)",
           content = @Content(
               mediaType = "application/json",
               examples = @ExampleObject(
-                  name = "GLB-S002",
+                  name = "GLB-S001",
                   value = """
                       {
                         "success": true,
-                        "code": "GLB-S002",
-                        "message": "리소스가 생성되었습니다."
+                        "code": "GLB-S001",
+                        "message": "요청이 성공했습니다."
                       }
                       """))),
       @ApiResponse(
@@ -303,7 +302,7 @@ public interface MatchApi {
                       }
                       """)))
   })
-  ResponseEntity<BaseResponse<Void>> skip(
+  BaseResponse<Void> skip(
       @Parameter(
           name = "X-User-Id",
           in = ParameterIn.HEADER,
