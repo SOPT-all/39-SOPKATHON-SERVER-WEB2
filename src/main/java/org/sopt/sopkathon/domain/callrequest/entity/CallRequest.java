@@ -62,10 +62,6 @@ public class CallRequest extends BaseEntity {
   @Column(name = "call_tapped_at")
   private LocalDateTime callTappedAt;
 
-  /** "통화하셨나요?"에서 예를 누른 시각 */
-  @Column(name = "connected_at")
-  private LocalDateTime connectedAt;
-
   private CallRequest(User requester, User receiver, String message) {
     this.requester = requester;
     this.receiver = receiver;
@@ -82,6 +78,5 @@ public class CallRequest extends BaseEntity {
 
   public void connect() {
     this.status = CallRequestStatus.CONNECTED;
-    this.connectedAt = LocalDateTime.now();
   }
 }
