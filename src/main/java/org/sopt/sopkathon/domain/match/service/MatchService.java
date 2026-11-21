@@ -6,13 +6,16 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.sopt.sopkathon.domain.callrequest.service.CallRequestService;
+import org.sopt.sopkathon.domain.match.code.MatchErrorCode;
 import org.sopt.sopkathon.domain.match.dto.MatchListResponse;
 import org.sopt.sopkathon.domain.match.dto.MatchUserResponse;
+import org.sopt.sopkathon.domain.match.entity.MatchSkip;
 import org.sopt.sopkathon.domain.match.repository.MatchSkipRepository;
 import org.sopt.sopkathon.domain.user.entity.Gender;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.service.UserService;
 import org.sopt.sopkathon.global.common.util.DistanceCalculator;
+import org.sopt.sopkathon.global.exception.BaseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +46,24 @@ public class MatchService {
 
     boolean hasNext = sorted.size() > limit;
     return MatchListResponse.of(sorted.subList(0, Math.min(limit, sorted.size())), hasNext);
+  }
+
+  /**
+   * 상대를 넘긴다. 넘긴 상대는 이후 매칭에서 제외된다. 이미 넘긴 상대면 저장하지 않고 성공으로 끝낸다. 같은 요청이 동시에 들어와 둘 다
+   * 확인을 통과하면 uq_match_skip_pair 유니크 제약이 막고 전역 핸들러가 409로 응답한다.
+   */
+  @Transactional
+  public void skip(Long userId, Long targetId) {
+    if (userId.equals(targetId)) {
+      throw new BaseException(MatchErrorCode.CANNOT_SKIP_SELF);
+    }
+    User me = userService.getOnboardedUser(userId);
+    User target = userService.getUser(targetId);
+
+    if (matchSkipRepository.existsByUserIdAndTargetId(me.getId(), target.getId())) {
+      return;
+    }
+    matchSkipRepository.save(MatchSkip.create(me, target));
   }
 
   /** 매칭에서 빼는 회원: 나 자신, 내가 넘긴 상대, 요청을 주고받은 상대(양방향). */
