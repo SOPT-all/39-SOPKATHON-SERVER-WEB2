@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -217,6 +218,21 @@ public class GlobalExceptionHandler {
         e.getSupportedHttpMethods()
     );
     return errorResponse(GlobalErrorCode.METHOD_NOT_ALLOWED);
+  }
+
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  public ResponseEntity<BaseResponse<Void>> handleMaxUploadSizeExceeded(
+      MaxUploadSizeExceededException e,
+      HttpServletRequest request
+  ) {
+
+    log.warn(
+        "[MaxUploadSizeExceededException] {} {} → maxUploadSize={}",
+        request.getMethod(),
+        request.getRequestURI(),
+        e.getMaxUploadSize()
+    );
+    return errorResponse(GlobalErrorCode.PAYLOAD_TOO_LARGE);
   }
 
   @ExceptionHandler(Exception.class)
