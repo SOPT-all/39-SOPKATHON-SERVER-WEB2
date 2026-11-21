@@ -3,6 +3,7 @@ package org.sopt.sopkathon.domain.callrequest.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.sopkathon.domain.callrequest.code.CallRequestErrorCode;
+import org.sopt.sopkathon.domain.callrequest.dto.CallRequestConnectResponse;
 import org.sopt.sopkathon.domain.callrequest.dto.CallRequestCreateRequest;
 import org.sopt.sopkathon.domain.callrequest.dto.CallRequestCreateResponse;
 import org.sopt.sopkathon.domain.callrequest.dto.ReceivedRequestListResponse;
@@ -52,6 +53,16 @@ public class CallRequestService {
     CallRequest saved =
         callRequestRepository.save(CallRequest.create(requester, receiver, request.message()));
     return CallRequestCreateResponse.from(saved);
+  }
+
+  /** 이미 CONNECTED여도 에러 없이 성공한다 (다시 전화하거나 여러 번 눌러도 결과가 같음). */
+  @Transactional
+  public CallRequestConnectResponse connect(Long userId, Long requestId) {
+    CallRequest callRequest = callRequestRepository
+        .findByIdAndReceiverId(requestId, userId)
+        .orElseThrow(() -> new BaseException(CallRequestErrorCode.CALL_REQUEST_NOT_FOUND));
+    callRequest.connect();
+    return CallRequestConnectResponse.from(callRequest);
   }
 
   /** called가 null이면 전체, true면 통화 완료, false면 통화 전만 조회한다. 거리는 fetch join한 requester 좌표로 계산해 추가 쿼리가 없다. */

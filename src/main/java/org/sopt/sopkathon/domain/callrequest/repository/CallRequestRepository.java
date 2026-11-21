@@ -1,6 +1,7 @@
 package org.sopt.sopkathon.domain.callrequest.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.sopt.sopkathon.domain.callrequest.entity.CallRequest;
 import org.sopt.sopkathon.domain.callrequest.entity.CallRequestStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface CallRequestRepository extends JpaRepository<CallRequest, Long> {
+
+  /** 남의 요청도 없는 요청처럼 404가 되도록 받은 사람 조건으로 조회한다 (요청 존재 여부를 숨김). */
+  Optional<CallRequest> findByIdAndReceiverId(Long id, Long receiverId);
 
   /** 두 회원 사이에 어느 방향으로든 요청이 있는지 한 번의 쿼리로 확인한다. */
   @Query(

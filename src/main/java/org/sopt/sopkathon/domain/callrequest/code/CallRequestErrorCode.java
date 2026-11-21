@@ -31,6 +31,12 @@ public enum CallRequestErrorCode implements ErrorCode {
       "REQ-E004",
       HttpStatus.BAD_REQUEST,
       "넘긴 상대에게는 요청할 수 없습니다."
+  ),
+
+  CALL_REQUEST_NOT_FOUND(
+      "REQ-E005",
+      HttpStatus.NOT_FOUND,
+      "존재하지 않는 전화 요청입니다."
   );
 
   private final String code;
