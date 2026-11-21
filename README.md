@@ -5,6 +5,12 @@
 - Spring Data JPA, MySQL (로컬·운영) / H2 (테스트), Docker Compose (로컬 MySQL)
 - Lombok, springdoc-openapi (Swagger), Gradle
 
+## 👥 팀원 및 역할
+|                                                       이해령(LEAD)                                                       |                                                          홍정우                                                          |
+|:---------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------:|
+| <img width="250" alt="image" src="https://spokerthon-39.s3.ap-northeast-2.amazonaws.com/dummy/profiles/user_02.png" /> | <img width="250" alt="image" src="https://spokerthon-39.s3.ap-northeast-2.amazonaws.com/dummy/profiles/user_09.png" /> |
+|<a href="https://github.com/haerxeong" target="_blank">@haerxeong</a>|<a href="https://github.com/Erichong7" target="_blank">@Erichong7</a>|
+
 ## 🚀 실행 방법
 ```bash
 cp .env.example .env   # DB 비밀번호 등 값 설정
