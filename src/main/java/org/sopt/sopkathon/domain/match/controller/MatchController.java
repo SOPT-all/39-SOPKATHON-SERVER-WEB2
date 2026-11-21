@@ -23,7 +23,7 @@ public class MatchController implements MatchApi {
   @GetMapping
   public BaseResponse<MatchListResponse> getMatches(
       @RequestHeader("X-User-Id") Long userId,
-      @RequestParam(defaultValue = "10") int limit) {
+      @RequestParam(defaultValue = DEFAULT_LIMIT) int limit) {
     return BaseResponse.success(GlobalSuccessCode.OK, matchService.getMatches(userId, limit));
   }
 }

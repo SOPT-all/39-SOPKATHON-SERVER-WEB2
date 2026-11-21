@@ -18,6 +18,10 @@ import org.sopt.sopkathon.global.response.BaseResponse;
 @Tag(name = "Match", description = "매칭 상대 조회 · 넘기기")
 public interface MatchApi {
 
+  // 기본값·범위는 컨트롤러의 @RequestParam과 Swagger 문서가 함께 참조한다
+  String DEFAULT_LIMIT = "10";
+  int MAX_LIMIT = 50;
+
   @Operation(
       summary = "매칭 상대 조회",
       description = """
@@ -128,7 +132,7 @@ public interface MatchApi {
                           }
                           """),
                   @ExampleObject(
-                      name = "GLB-E001 limit 범위 밖 (1 ~ 50)",
+                      name = "GLB-E001 limit 범위 밖 (1 ~ " + MAX_LIMIT + ")",
                       value = """
                           {
                             "success": false,
@@ -177,7 +181,8 @@ public interface MatchApi {
       @Parameter(
           name = "limit",
           in = ParameterIn.QUERY,
-          description = "한 번에 받을 상대 수 (1 ~ 50, 기본값 10)",
-          schema = @Schema(type = "integer", minimum = "1", maximum = "50", defaultValue = "10"))
-      @Min(1) @Max(50) int limit);
+          description = "한 번에 받을 상대 수 (1 ~ " + MAX_LIMIT + ", 기본값 " + DEFAULT_LIMIT + ")",
+          schema = @Schema(
+              type = "integer", minimum = "1", maximum = "" + MAX_LIMIT, defaultValue = DEFAULT_LIMIT))
+      @Min(1) @Max(MAX_LIMIT) int limit);
 }

@@ -18,6 +18,11 @@ import org.sopt.sopkathon.global.response.BaseResponse;
 @Tag(name = "Place", description = "근처 제휴 장소")
 public interface PlaceApi {
 
+  // 기본값·범위는 컨트롤러의 @RequestParam과 Swagger 문서가 함께 참조한다
+  String DEFAULT_PAGE = "0";
+  String DEFAULT_SIZE = "20";
+  int MAX_SIZE = 50;
+
   @Operation(
       summary = "근처 장소 리스트 조회",
       description = """
@@ -152,13 +157,14 @@ public interface PlaceApi {
       @Parameter(
           name = "page",
           in = ParameterIn.QUERY,
-          description = "페이지 번호 (0부터, 기본값 0)",
-          schema = @Schema(type = "integer", minimum = "0", defaultValue = "0"))
+          description = "페이지 번호 (0부터, 기본값 " + DEFAULT_PAGE + ")",
+          schema = @Schema(type = "integer", minimum = "0", defaultValue = DEFAULT_PAGE))
       @Min(0) int page,
       @Parameter(
           name = "size",
           in = ParameterIn.QUERY,
-          description = "한 페이지당 장소 수 (1 ~ 50, 기본값 20)",
-          schema = @Schema(type = "integer", minimum = "1", maximum = "50", defaultValue = "20"))
-      @Min(1) @Max(50) int size);
+          description = "한 페이지당 장소 수 (1 ~ " + MAX_SIZE + ", 기본값 " + DEFAULT_SIZE + ")",
+          schema = @Schema(
+              type = "integer", minimum = "1", maximum = "" + MAX_SIZE, defaultValue = DEFAULT_SIZE))
+      @Min(1) @Max(MAX_SIZE) int size);
 }

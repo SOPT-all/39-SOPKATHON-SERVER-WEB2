@@ -23,8 +23,8 @@ public class PlaceController implements PlaceApi {
   @GetMapping
   public BaseResponse<PlaceListResponse> getNearbyPlaces(
       @RequestHeader("X-User-Id") Long userId,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "20") int size) {
+      @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+      @RequestParam(defaultValue = DEFAULT_SIZE) int size) {
     return BaseResponse.success(
         GlobalSuccessCode.OK, placeService.getNearbyPlaces(userId, page, size));
   }
