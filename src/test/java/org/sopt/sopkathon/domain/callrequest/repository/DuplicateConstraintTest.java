@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 
-/** 동시 요청으로 exists 체크를 통과해도 DB 유니크 제약이 중복 저장을 막는지 확인한다. */
 @DataJpaTest
 class DuplicateConstraintTest {
 

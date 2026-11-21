@@ -22,16 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * 여러 스레드가 실제 DB에 동시에 저장하는 상황을 확인한다.
- *
- * <p>테스트 클래스의 {@code @Transactional}은 다른 스레드에 적용되지 않아 롤백되지 않으므로, 이 클래스는 트랜잭션 없이
- * 실행하고 끝난 뒤 데이터를 직접 지운다. 실제 DB에 커밋하는 테스트라 두 가지로 방어한다.
- *
- * <ul>
- *   <li>시작 전에 접속한 DB가 H2 인메모리인지 확인하고, 아니면 아무것도 쓰기 전에 실패시킨다 (환경 변수
- *       {@code SPRING_DATASOURCE_URL} 등은 테스트 프로필 설정보다 우선하므로 다른 DB로 붙을 수 있다)
- *   <li>정리할 때 전체 삭제({@code deleteAll}) 대신 이 테스트가 만든 번호만 지운다
- * </ul>
+ * 실제 DB에 커밋하는 테스트. 테스트 트랜잭션 롤백이 다른 스레드에는 적용되지 않으므로,
+ * 시작 전에 H2 인메모리인지 확인하고 끝나면 이 테스트가 만든 데이터만 지운다.
  */
 @SpringBootTest
 @ActiveProfiles("test")

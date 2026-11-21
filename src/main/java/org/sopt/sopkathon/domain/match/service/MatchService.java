@@ -25,10 +25,7 @@ public class MatchService {
   private final CallRequestService callRequestService;
   private final MatchSkipRepository matchSkipRepository;
 
-  /**
-   * 가까운 순으로 최대 limit명을 반환한다. 거리가 같으면 userId 오름차순. 회원 수가 적은 해커톤 단계라 후보 전체를 한 번에 조회한 뒤
-   * 서버에서 거리를 계산해 정렬하고 자른다.
-   */
+  /** 해커톤 규모라 후보 전체를 조회해 서버에서 거리 계산·정렬한다. 회원이 많아지면 쿼리로 옮긴다. */
   public MatchListResponse getMatches(Long userId, int limit) {
     User me = userService.getOnboardedUser(userId);
 
@@ -45,7 +42,6 @@ public class MatchService {
     return MatchListResponse.of(sorted.subList(0, Math.min(limit, sorted.size())), hasNext);
   }
 
-  /** 매칭에서 빼는 회원: 나 자신, 내가 넘긴 상대, 요청을 주고받은 상대(양방향). */
   private Set<Long> excludedIds(User me) {
     Set<Long> excludedIds = new HashSet<>();
     excludedIds.add(me.getId());
@@ -54,7 +50,6 @@ public class MatchService {
     return excludedIds;
   }
 
-  /** 나와 다른 성별만 매칭한다. */
   private Gender oppositeOf(Gender gender) {
     return gender == Gender.MALE ? Gender.FEMALE : Gender.MALE;
   }

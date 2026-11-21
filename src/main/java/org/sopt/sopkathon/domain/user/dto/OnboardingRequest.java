@@ -14,11 +14,7 @@ import java.math.RoundingMode;
 import org.sopt.sopkathon.domain.user.entity.Gender;
 import org.sopt.sopkathon.domain.user.entity.OnboardingProfile;
 
-/**
- * 온보딩 정보 (multipart의 {@code request} JSON 파트). 모든 값이 필수다.
- *
- * <p>닉네임은 생성 시점에 앞뒤 공백을 제거하므로, 길이 검증은 공백을 뺀 값 기준이다.
- */
+/** 닉네임은 생성 시점에 앞뒤 공백을 제거하므로 길이 검증도 공백을 뺀 값 기준이다. */
 @Schema(description = "온보딩 정보 (모든 값 필수)")
 public record OnboardingRequest(
     @Schema(description = "이름(닉네임). 앞뒤 공백 제외 1 ~ 10자", example = "순자")
@@ -57,10 +53,7 @@ public record OnboardingRequest(
     nickname = nickname == null ? null : nickname.strip();
   }
 
-  /**
-   * 저장할 온보딩 정보로 변환한다. 성별 문자열은 {@code @Pattern}으로 검증된 값이라는 전제이므로 {@code @Valid}를 거친 뒤에만
-   * 호출한다. 좌표는 DB 컬럼(scale 6)에 맞춰 반올림한다.
-   */
+  /** {@code @Valid}를 거친 뒤에만 호출한다 (성별 문자열이 검증됐다는 전제). */
   public OnboardingProfile toProfile(String profileImageUrl) {
     return OnboardingProfile.builder()
         .nickname(nickname)

@@ -12,10 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 온보딩 흐름(검증 → 사진 업로드 → 저장)을 조합한다.
- *
- * <p>주의: 이 클래스에는 {@code @Transactional}을 붙이지 않는다. S3 업로드 동안 DB 커넥션을 잡지 않도록, 저장만
- * {@link UserService#completeOnboarding}의 트랜잭션에서 처리한다.
+ * {@code @Transactional}을 붙이지 않는다.
+ * S3 업로드 동안 DB 커넥션을 잡지 않도록 저장만 UserService 트랜잭션에서 처리한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class OnboardingService {
 
   public OnboardingResponse completeOnboarding(
       Long userId, MultipartFile profileImage, OnboardingRequest request) {
-    // 실패할 요청 때문에 S3에 사용되지 않는 사진이 쌓이지 않도록 업로드 전에 확인한다.
+    // 실패할 요청으로 S3에 사진이 쌓이지 않도록 업로드 전에 확인
     User user = userService.getUser(userId);
     if (user.isOnboarded()) {
       throw new BaseException(UserErrorCode.ALREADY_ONBOARDED);
@@ -34,7 +32,7 @@ public class OnboardingService {
 
     String profileImageUrl = s3ImageService.upload(profileImage, ImageDirectory.PROFILE);
 
-    // DB 저장이 실패하면 업로드한 사진이 S3에 남는다. 해커톤 범위에서는 정리하지 않는다.
+    // DB 저장이 실패하면 사진이 S3에 남는다 (해커톤 범위에서는 정리하지 않음)
     User onboarded = userService.completeOnboarding(userId, request.toProfile(profileImageUrl));
     return OnboardingResponse.from(onboarded);
   }

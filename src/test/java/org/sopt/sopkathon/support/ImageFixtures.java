@@ -12,7 +12,6 @@ public final class ImageFixtures {
 
   private ImageFixtures() {}
 
-  /** 확장자(jpg, jpeg, png, webp)에 맞는 이미지 바이트 */
   public static byte[] bytesOf(String filename) {
     String lower = filename.toLowerCase();
     if (lower.endsWith(".png")) {

@@ -18,10 +18,6 @@ public class UserService {
 
   private final UserRepository userRepository;
 
-  /**
-   * 전화번호로 회원을 찾고, 없으면 새로 만든다. 저장과 조회 모두 정규화한 번호를 사용해 하이픈 유무와 관계없이 같은 회원으로
-   * 취급한다.
-   */
   @Transactional
   public User findOrCreateByPhoneNumber(String rawPhoneNumber) {
     String phoneNumber = User.normalizePhoneNumber(rawPhoneNumber);
@@ -36,10 +32,7 @@ public class UserService {
         .orElseThrow(() -> new BaseException(UserErrorCode.USER_NOT_FOUND));
   }
 
-  /**
-   * 온보딩 정보를 저장한다. 같은 회원이 동시에 요청해도 락으로 순서대로 처리되어, 두 번째 요청은 이미 온보딩한 상태를 보고
-   * 409로 실패한다.
-   */
+  /** 락으로 동시 요청을 순서대로 처리해, 두 번째 요청은 이미 온보딩한 상태를 보고 409로 실패한다. */
   @Transactional
   public User completeOnboarding(Long userId, OnboardingProfile profile) {
     User user = userRepository
@@ -49,7 +42,6 @@ public class UserService {
     return user;
   }
 
-  /** 위치·성별 등 온보딩 정보가 필요한 기능에서 사용한다. 좌표가 없으면 온보딩을 마치지 않은 것으로 본다. */
   @Transactional(readOnly = true)
   public User getOnboardedUser(Long userId) {
     User user = getUser(userId);
@@ -59,7 +51,6 @@ public class UserService {
     return user;
   }
 
-  /** 온보딩을 마치고 좌표가 있는 회원 중 해당 성별인 회원. excludedIds에 담긴 회원은 제외한다. */
   @Transactional(readOnly = true)
   public List<User> findOnboardedByGenderExcluding(Gender gender, Collection<Long> excludedIds) {
     if (excludedIds.isEmpty()) {

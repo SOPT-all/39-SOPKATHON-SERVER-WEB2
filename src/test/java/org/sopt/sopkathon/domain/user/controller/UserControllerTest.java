@@ -180,7 +180,6 @@ class UserControllerTest {
         .andExpect(status().isConflict())
         .andExpect(jsonPath("$.code").value("USR-E004"));
 
-    // 첫 번째 요청에서만 업로드
     verify(s3Client, org.mockito.Mockito.times(1))
         .putObject(any(PutObjectRequest.class), any(RequestBody.class));
   }

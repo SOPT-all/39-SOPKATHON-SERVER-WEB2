@@ -15,7 +15,6 @@ import org.sopt.sopkathon.global.response.BaseResponse;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
-/** {@link UserController}의 Swagger 명세. 컨트롤러에는 동작 코드만 두고 문서는 여기서 관리한다. */
 @Tag(name = "User", description = "온보딩")
 public interface UserApi {
 

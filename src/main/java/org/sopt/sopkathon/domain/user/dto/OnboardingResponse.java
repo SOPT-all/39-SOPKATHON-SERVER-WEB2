@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.sopkathon.domain.user.entity.Gender;
 import org.sopt.sopkathon.domain.user.entity.User;
 
-/** 온보딩 결과. 좌표와 전화번호는 담지 않는다. */
 @Schema(description = "온보딩 결과 (좌표·전화번호는 포함하지 않음)")
 public record OnboardingResponse(
     @Schema(description = "회원 ID", example = "1") Long userId,

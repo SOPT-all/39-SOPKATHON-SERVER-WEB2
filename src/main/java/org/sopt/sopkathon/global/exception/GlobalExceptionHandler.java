@@ -150,7 +150,6 @@ public class GlobalExceptionHandler {
     return errorResponse(GlobalErrorCode.INVALID_REQUEST);
   }
 
-  /** X-User-Id 같은 필수 헤더 누락 */
   @ExceptionHandler(MissingRequestHeaderException.class)
   public ResponseEntity<BaseResponse<Void>> handleMissingRequestHeader(
       MissingRequestHeaderException e,
@@ -240,7 +239,6 @@ public class GlobalExceptionHandler {
     return errorResponse(GlobalErrorCode.METHOD_NOT_ALLOWED);
   }
 
-  /** Content-Type 헤더가 없거나 지원하지 않는 형식(예: JSON API에 text/plain)으로 요청한 경우. */
   @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
   public ResponseEntity<BaseResponse<Void>> handleHttpMediaTypeNotSupported(
       HttpMediaTypeNotSupportedException e,
@@ -257,7 +255,6 @@ public class GlobalExceptionHandler {
     return errorResponse(GlobalErrorCode.UNSUPPORTED_MEDIA_TYPE);
   }
 
-  /** multipart 요청에서 필수 파트(파일, JSON 등) 누락 */
   @ExceptionHandler(MissingServletRequestPartException.class)
   public ResponseEntity<BaseResponse<Void>> handleMissingServletRequestPart(
       MissingServletRequestPartException e,
@@ -289,8 +286,8 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * 유니크 제약 위반 등 DB 무결성 위반. 중복 클릭처럼 동시에 같은 요청이 들어와 exists 체크를 둘 다 통과한 경우
-   * DB 제약이 막아주므로 500 대신 409로 응답한다. 원인 메시지에는 중복된 값(전화번호 등)이 담길 수 있어 로그에 남기지 않는다.
+   * 동시 요청으로 exists 체크를 통과해도 DB 제약이 막으므로 500 대신 409로 응답한다.
+   * 원인 메시지에 중복 값(전화번호 등)이 담길 수 있어 로그에 남기지 않는다.
    */
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<BaseResponse<Void>> handleDataIntegrityViolation(

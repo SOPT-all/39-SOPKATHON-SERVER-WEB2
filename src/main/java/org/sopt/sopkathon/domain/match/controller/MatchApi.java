@@ -14,10 +14,7 @@ import jakarta.validation.constraints.Min;
 import org.sopt.sopkathon.domain.match.dto.MatchListResponse;
 import org.sopt.sopkathon.global.response.BaseResponse;
 
-/**
- * {@link MatchController}의 Swagger 명세. 컨트롤러에는 동작 코드만 두고 문서는 여기서 관리한다.
- * 파라미터 검증 제약(@Min, @Max)도 여기에만 선언한다 (구현 메서드에서 제약을 새로 추가할 수 없음).
- */
+/** 파라미터 검증 제약(@Min, @Max)은 여기에만 선언한다. 구현 메서드에서는 제약을 추가할 수 없다. */
 @Tag(name = "Match", description = "매칭 상대 조회 · 넘기기")
 public interface MatchApi {
 

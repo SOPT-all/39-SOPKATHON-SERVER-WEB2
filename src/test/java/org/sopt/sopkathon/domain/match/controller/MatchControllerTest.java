@@ -177,10 +177,7 @@ class MatchControllerTest {
     return userRepository.save(user);
   }
 
-  /**
-   * 온보딩은 했지만 좌표가 비어 있는 회원. 엔티티 메서드로는 만들 수 없어서(좌표 필수), DB에 직접 넣은 데이터처럼 SQL로 좌표를
-   * 지운다.
-   */
+  /** 엔티티로는 좌표 없는 온보딩을 만들 수 없어, DB에 직접 넣은 데이터처럼 SQL로 좌표를 지운다. */
   private User onboardedUserWithoutLocation(String phoneNumber, Gender gender) {
     User user = onboardedUser(phoneNumber, "좌표없음", gender, BASE_LAT, BASE_LON);
     entityManager.flush();
