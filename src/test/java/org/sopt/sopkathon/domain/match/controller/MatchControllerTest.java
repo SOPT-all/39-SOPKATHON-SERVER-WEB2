@@ -84,6 +84,33 @@ class MatchControllerTest {
   }
 
   @Test
+  void 좌표가_없는_상대는_제외한다() throws Exception {
+    User noLocation = User.create("01011111111");
+    noLocation.completeOnboarding(
+        "좌표없음", Gender.FEMALE, 30, "https://example.com/a.jpg", null, null);
+    userRepository.save(noLocation);
+    User visible = onboardedUser("01022222222", "보이는사람", Gender.FEMALE, "37.551000", BASE_LON);
+
+    mockMvc
+        .perform(get("/api/v1/matches").header("X-User-Id", me.getId()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.users[*].userId").value(contains(visible.getId().intValue())));
+  }
+
+  @Test
+  void 내_좌표가_없으면_400() throws Exception {
+    User noLocation = User.create("01055555555");
+    noLocation.completeOnboarding(
+        "좌표없음", Gender.MALE, 30, "https://example.com/b.jpg", null, null);
+    userRepository.save(noLocation);
+
+    mockMvc
+        .perform(get("/api/v1/matches").header("X-User-Id", noLocation.getId()))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("USR-E003"));
+  }
+
+  @Test
   void limit보다_후보가_많으면_limit명만_주고_hasNext가_true다() throws Exception {
     onboardedUser("01011111111", "a", Gender.FEMALE, "37.551000", BASE_LON);
     onboardedUser("01022222222", "b", Gender.FEMALE, "37.552000", BASE_LON);

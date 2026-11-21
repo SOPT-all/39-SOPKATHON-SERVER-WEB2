@@ -1,5 +1,6 @@
 package org.sopt.sopkathon.domain.user.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.sopt.sopkathon.domain.user.entity.Gender;
@@ -13,22 +14,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Optional<User> findByPhoneNumber(String phoneNumber);
 
   /**
-   * 매칭 후보를 한 번에 조회한다. 나 자신, 온보딩 미완료, 같은 성별, 내가 넘긴 상대, 요청을 주고받은 상대(양방향)는 제외한다. 거리
-   * 계산·정렬은 서비스에서 한다.
+   * 온보딩을 마치고 좌표가 있는 회원 중 해당 성별인 회원을 조회한다. excludedIds에 담긴 회원은 제외한다. excludedIds는 비어 있으면
+   * 안 된다 (빈 IN 절).
    */
   @Query(
       """
       select u from User u
-      where u.id <> :userId
-        and u.onboardedAt is not null
-        and u.gender <> :gender
-        and not exists (
-          select 1 from MatchSkip s
-          where s.user.id = :userId and s.target.id = u.id)
-        and not exists (
-          select 1 from CallRequest c
-          where (c.requester.id = :userId and c.receiver.id = u.id)
-             or (c.requester.id = u.id and c.receiver.id = :userId))
+      where u.onboardedAt is not null
+        and u.latitude is not null
+        and u.longitude is not null
+        and u.gender = :gender
+        and u.id not in :excludedIds
       """)
-  List<User> findMatchCandidates(@Param("userId") Long userId, @Param("gender") Gender gender);
+  List<User> findOnboardedByGenderExcluding(
+      @Param("gender") Gender gender, @Param("excludedIds") Collection<Long> excludedIds);
 }
