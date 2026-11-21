@@ -13,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.sopt.sopkathon.domain.callrequest.entity.CallRequest;
 import org.sopt.sopkathon.domain.callrequest.repository.CallRequestRepository;
+import org.sopt.sopkathon.domain.match.entity.MatchSkip;
+import org.sopt.sopkathon.domain.match.repository.MatchSkipRepository;
 import org.sopt.sopkathon.domain.user.entity.Gender;
 import org.sopt.sopkathon.domain.user.entity.OnboardingProfile;
 import org.sopt.sopkathon.domain.user.entity.User;
@@ -37,6 +39,7 @@ class CallRequestControllerTest {
   @Autowired private MockMvc mockMvc;
   @Autowired private UserRepository userRepository;
   @Autowired private CallRequestRepository callRequestRepository;
+  @Autowired private MatchSkipRepository matchSkipRepository;
 
   private User me;
   private User receiver;
@@ -126,6 +129,36 @@ class CallRequestControllerTest {
     send(me.getId(), "{\"receiverId\": %d}".formatted(me.getId()))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.code").value("REQ-E001"));
+  }
+
+  @Test
+  void 같은_성별에게_요청하면_400() throws Exception {
+    User sameGender = onboardedUser("01055555555", Gender.MALE, "37.551000");
+
+    send(me.getId(), "{\"receiverId\": %d}".formatted(sameGender.getId()))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("REQ-E003"));
+
+    assertThat(callRequestRepository.count()).isZero();
+  }
+
+  @Test
+  void 내가_넘긴_상대에게_요청하면_400() throws Exception {
+    matchSkipRepository.save(MatchSkip.create(me, receiver));
+
+    send(me.getId(), "{\"receiverId\": %d}".formatted(receiver.getId()))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("REQ-E004"));
+
+    assertThat(callRequestRepository.count()).isZero();
+  }
+
+  @Test
+  void 상대가_나를_넘겼어도_나는_요청할_수_있다() throws Exception {
+    matchSkipRepository.save(MatchSkip.create(receiver, me));
+
+    send(me.getId(), "{\"receiverId\": %d}".formatted(receiver.getId()))
+        .andExpect(status().isCreated());
   }
 
   @Test

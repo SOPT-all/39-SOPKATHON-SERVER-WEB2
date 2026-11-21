@@ -19,6 +19,18 @@ public enum CallRequestErrorCode implements ErrorCode {
       "REQ-E002",
       HttpStatus.CONFLICT,
       "이미 요청을 주고받은 상대입니다."
+  ),
+
+  SAME_GENDER(
+      "REQ-E003",
+      HttpStatus.BAD_REQUEST,
+      "같은 성별에게는 요청할 수 없습니다."
+  ),
+
+  SKIPPED_TARGET(
+      "REQ-E004",
+      HttpStatus.BAD_REQUEST,
+      "넘긴 상대에게는 요청할 수 없습니다."
   );
 
   private final String code;

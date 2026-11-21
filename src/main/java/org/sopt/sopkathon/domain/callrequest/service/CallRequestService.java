@@ -7,6 +7,7 @@ import org.sopt.sopkathon.domain.callrequest.dto.CallRequestCreateRequest;
 import org.sopt.sopkathon.domain.callrequest.dto.CallRequestCreateResponse;
 import org.sopt.sopkathon.domain.callrequest.entity.CallRequest;
 import org.sopt.sopkathon.domain.callrequest.repository.CallRequestRepository;
+import org.sopt.sopkathon.domain.match.service.MatchSkipService;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.service.UserService;
 import org.sopt.sopkathon.global.exception.BaseException;
@@ -19,6 +20,7 @@ public class CallRequestService {
 
   private final CallRequestRepository callRequestRepository;
   private final UserService userService;
+  private final MatchSkipService matchSkipService;
 
   /**
    * 같은 방향 요청이 동시에 들어와 둘 다 중복 확인을 통과하면 uq_call_request_pair가 막고 409로 응답한다. 반대 방향(A→B, B→A)이
@@ -33,8 +35,14 @@ public class CallRequestService {
     User requester = userService.getOnboardedUser(requesterId);
     User receiver = userService.getOnboardedTarget(receiverId);
 
-    if (callRequestRepository.existsByRequesterIdAndReceiverId(requesterId, receiverId)
-        || callRequestRepository.existsByRequesterIdAndReceiverId(receiverId, requesterId)) {
+    // 매칭 화면에는 다른 성별·넘기지 않은 상대만 나오지만, API를 직접 호출하는 경우를 막는다.
+    if (requester.getGender() == receiver.getGender()) {
+      throw new BaseException(CallRequestErrorCode.SAME_GENDER);
+    }
+    if (matchSkipService.hasSkipped(requesterId, receiverId)) {
+      throw new BaseException(CallRequestErrorCode.SKIPPED_TARGET);
+    }
+    if (callRequestRepository.existsBetween(requesterId, receiverId)) {
       throw new BaseException(CallRequestErrorCode.ALREADY_REQUESTED);
     }
     CallRequest saved =

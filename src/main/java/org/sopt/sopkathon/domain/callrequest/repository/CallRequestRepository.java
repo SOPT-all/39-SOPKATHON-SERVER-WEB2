@@ -8,7 +8,15 @@ import org.springframework.data.repository.query.Param;
 
 public interface CallRequestRepository extends JpaRepository<CallRequest, Long> {
 
-  boolean existsByRequesterIdAndReceiverId(Long requesterId, Long receiverId);
+  /** 두 회원 사이에 어느 방향으로든 요청이 있는지 한 번의 쿼리로 확인한다. */
+  @Query(
+      """
+      select case when count(c) > 0 then true else false end
+      from CallRequest c
+      where (c.requester.id = :userId and c.receiver.id = :otherId)
+         or (c.requester.id = :otherId and c.receiver.id = :userId)
+      """)
+  boolean existsBetween(@Param("userId") Long userId, @Param("otherId") Long otherId);
 
   /** 나와 요청을 주고받은 상대의 ID. 내가 보낸 요청이면 받은 사람, 나에게 온 요청이면 보낸 사람. */
   @Query(

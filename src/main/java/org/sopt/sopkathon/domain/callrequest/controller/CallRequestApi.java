@@ -31,6 +31,8 @@ public interface CallRequestApi {
 
           ③ 같은 상대에게 다시 요청하거나, 상대가 이미 나에게 요청을 보낸 경우에는 409입니다.
 
+          ④ 같은 성별이거나 내가 넘긴 상대에게는 요청할 수 없습니다. (400, 매칭 목록에 나온 상대라면 생기지 않음)
+
           **화면에서 쓰는 방법**
 
           ① 성공하면 들고 있던 매칭 목록에서 그 사람을 빼고 번호 주기 완료(S-004)로 이동합니다.
@@ -84,6 +86,24 @@ public interface CallRequestApi {
                             "success": false,
                             "code": "REQ-E001",
                             "message": "자기 자신에게는 요청할 수 없습니다."
+                          }
+                          """),
+                  @ExampleObject(
+                      name = "REQ-E003 같은 성별에게 요청",
+                      value = """
+                          {
+                            "success": false,
+                            "code": "REQ-E003",
+                            "message": "같은 성별에게는 요청할 수 없습니다."
+                          }
+                          """),
+                  @ExampleObject(
+                      name = "REQ-E004 넘긴 상대에게 요청",
+                      value = """
+                          {
+                            "success": false,
+                            "code": "REQ-E004",
+                            "message": "넘긴 상대에게는 요청할 수 없습니다."
                           }
                           """),
                   @ExampleObject(
