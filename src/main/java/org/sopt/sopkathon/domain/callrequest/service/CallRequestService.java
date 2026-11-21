@@ -51,7 +51,7 @@ public class CallRequestService {
     return CallRequestCreateResponse.from(saved);
   }
 
-  /** 받은 사람만 통화 완료로 바꿀 수 있다. 이미 CONNECTED여도 그대로 성공한다. */
+  /** 이미 CONNECTED여도 에러 없이 성공한다 (다시 전화하거나 여러 번 눌러도 결과가 같음). */
   @Transactional
   public CallRequestConnectResponse connect(Long userId, Long requestId) {
     CallRequest callRequest = callRequestRepository
