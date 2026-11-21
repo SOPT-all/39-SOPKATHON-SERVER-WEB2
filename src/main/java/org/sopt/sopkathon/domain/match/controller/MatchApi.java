@@ -180,4 +180,141 @@ public interface MatchApi {
           description = "한 번에 받을 상대 수 (1 ~ 50, 기본값 10)",
           schema = @Schema(type = "integer", minimum = "1", maximum = "50", defaultValue = "10"))
       @Min(1) @Max(50) int limit);
+
+  @Operation(
+      summary = "다음 사람 보기 (넘기기)",
+      description = """
+          매칭(S-003)에서 **다음 사람 보기**를 누르면 지금 보고 있는 상대를 넘깁니다.
+          넘긴 상대는 이후 매칭 상대 조회에서 다시 나오지 않습니다.
+
+          **화면에서 쓰는 방법**
+
+          ① 성공하면 들고 있던 목록에서 그 사람을 빼고 다음 카드를 보여줍니다. 매칭 상대 조회를 바로 다시 호출할 필요는 없습니다.
+
+          ② 목록을 다 쓰면 매칭 상대 조회 응답의 **hasNext**로 다음 동작을 정합니다.
+
+          ③ 응답을 받기 전까지 버튼을 비활성화해 주세요. 다음 사람을 건너뛰는 일을 막을 수 있습니다.
+
+          **중복 처리**
+
+          ① 이미 넘긴 상대를 다시 넘겨도 에러 없이 200으로 응답하고, 기록은 한 번만 남습니다.
+
+          ② 같은 요청이 동시에 들어와 409(GLB-E009)가 오면 이미 넘긴 것이므로 성공으로 처리해 주세요.
+          """)
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "넘기기 성공 (이미 넘긴 상대 포함)",
+          content = @Content(
+              mediaType = "application/json",
+              examples = @ExampleObject(
+                  name = "GLB-S001",
+                  value = """
+                      {
+                        "success": true,
+                        "code": "GLB-S001",
+                        "message": "요청이 성공했습니다."
+                      }
+                      """))),
+      @ApiResponse(
+          responseCode = "400",
+          description = "잘못된 요청",
+          content = @Content(
+              mediaType = "application/json",
+              examples = {
+                  @ExampleObject(
+                      name = "MAT-E001 자기 자신 넘기기",
+                      value = """
+                          {
+                            "success": false,
+                            "code": "MAT-E001",
+                            "message": "자기 자신은 넘길 수 없습니다."
+                          }
+                          """),
+                  @ExampleObject(
+                      name = "USR-E003 온보딩 미완료",
+                      value = """
+                          {
+                            "success": false,
+                            "code": "USR-E003",
+                            "message": "온보딩을 완료하지 않은 유저입니다."
+                          }
+                          """),
+                  @ExampleObject(
+                      name = "GLB-E001 X-User-Id 헤더 누락·숫자 아님",
+                      value = """
+                          {
+                            "success": false,
+                            "code": "GLB-E001",
+                            "message": "잘못된 요청입니다."
+                          }
+                          """),
+                  @ExampleObject(
+                      name = "GLB-E001 targetId 숫자 아님",
+                      value = """
+                          {
+                            "success": false,
+                            "code": "GLB-E001",
+                            "message": "잘못된 요청입니다."
+                          }
+                          """)
+              })),
+      @ApiResponse(
+          responseCode = "404",
+          description = "존재하지 않는 유저 (나 또는 상대)",
+          content = @Content(
+              mediaType = "application/json",
+              examples = @ExampleObject(
+                  name = "USR-E002",
+                  value = """
+                      {
+                        "success": false,
+                        "code": "USR-E002",
+                        "message": "존재하지 않는 유저입니다."
+                      }
+                      """))),
+      @ApiResponse(
+          responseCode = "409",
+          description = "같은 요청이 동시에 두 번 들어옴 (성공으로 처리)",
+          content = @Content(
+              mediaType = "application/json",
+              examples = @ExampleObject(
+                  name = "GLB-E009",
+                  value = """
+                      {
+                        "success": false,
+                        "code": "GLB-E009",
+                        "message": "이미 처리된 요청입니다."
+                      }
+                      """))),
+      @ApiResponse(
+          responseCode = "500",
+          description = "서버 내부 오류",
+          content = @Content(
+              mediaType = "application/json",
+              examples = @ExampleObject(
+                  name = "GLB-E005",
+                  value = """
+                      {
+                        "success": false,
+                        "code": "GLB-E005",
+                        "message": "서버 내부 오류가 발생했습니다."
+                      }
+                      """)))
+  })
+  BaseResponse<Void> skip(
+      @Parameter(
+          name = "X-User-Id",
+          in = ParameterIn.HEADER,
+          required = true,
+          description = "로그인 응답의 userId",
+          example = "1")
+      Long userId,
+      @Parameter(
+          name = "targetId",
+          in = ParameterIn.PATH,
+          required = true,
+          description = "넘길 상대의 userId (매칭 상대 조회 응답의 users[].userId)",
+          example = "7")
+      Long targetId);
 }

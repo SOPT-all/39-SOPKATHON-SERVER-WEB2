@@ -6,13 +6,16 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.sopt.sopkathon.domain.callrequest.service.CallRequestService;
+import org.sopt.sopkathon.domain.match.code.MatchErrorCode;
 import org.sopt.sopkathon.domain.match.dto.MatchListResponse;
 import org.sopt.sopkathon.domain.match.dto.MatchUserResponse;
+import org.sopt.sopkathon.domain.match.entity.MatchSkip;
 import org.sopt.sopkathon.domain.match.repository.MatchSkipRepository;
 import org.sopt.sopkathon.domain.user.entity.Gender;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.service.UserService;
 import org.sopt.sopkathon.global.common.util.DistanceCalculator;
+import org.sopt.sopkathon.global.exception.BaseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +43,21 @@ public class MatchService {
 
     boolean hasNext = sorted.size() > limit;
     return MatchListResponse.of(sorted.subList(0, Math.min(limit, sorted.size())), hasNext);
+  }
+
+  /** 동시에 같은 요청이 들어와 둘 다 중복 확인을 통과하면 유니크 제약이 막고 409로 응답한다. */
+  @Transactional
+  public void skip(Long userId, Long targetId) {
+    if (userId.equals(targetId)) {
+      throw new BaseException(MatchErrorCode.CANNOT_SKIP_SELF);
+    }
+    User me = userService.getOnboardedUser(userId);
+    User target = userService.getUser(targetId);
+
+    if (matchSkipRepository.existsByUserIdAndTargetId(me.getId(), target.getId())) {
+      return;
+    }
+    matchSkipRepository.save(MatchSkip.create(me, target));
   }
 
   private Set<Long> excludedIds(User me) {
