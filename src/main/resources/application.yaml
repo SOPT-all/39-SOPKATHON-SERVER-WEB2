@@ -18,8 +18,9 @@ spring:
 
   servlet:
     multipart:
+      # nginx client_max_body_size(10M)보다 작게 두어 Spring에서 JSON 에러(413)로 응답
       max-file-size: 5MB
-      max-request-size: 10MB
+      max-request-size: 8MB
 
 cloud:
   aws:
