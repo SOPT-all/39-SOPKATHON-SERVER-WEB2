@@ -27,10 +27,12 @@ public class PlaceService {
 
     List<PlaceResponse> sorted =
         placeRepository.findAllByActiveTrue().stream()
-            .map(place -> PlaceResponse.from(place, distanceBetween(me, place)))
+            .map(place -> new NearbyPlace(place, distanceBetween(me, place)))
             .sorted(
-                Comparator.comparingInt(PlaceResponse::distance)
-                    .thenComparing(PlaceResponse::placeId))
+                Comparator.comparingInt(NearbyPlace::distance)
+                    .thenComparing(nearby -> nearby.place().getId()))
+            .map(nearby -> PlaceResponse.from(
+                nearby.place(), DistanceCalculator.toDisplayDistance(nearby.distance())))
             .toList();
 
     // page가 아주 크면 page * size가 int 범위를 넘을 수 있어 long으로 계산
@@ -41,6 +43,8 @@ public class PlaceService {
     int to = (int) Math.min(from + size, sorted.size());
     return PlaceListResponse.of(sorted.subList((int) from, to), page, size, to < sorted.size());
   }
+
+  private record NearbyPlace(Place place, int distance) {}
 
   private int distanceBetween(User me, Place place) {
     return DistanceCalculator.distanceInMeters(

@@ -29,7 +29,7 @@ public interface PlaceApi {
           거리가 같으면 placeId 순이라 페이지를 넘겨도 순서가 바뀌지 않습니다. 반경 제한은 없습니다.
 
           ### 참고
-          imageUrl, address, benefitText, naverMapUrl은 **없으면 null**로 내려옵니다. distance는 미터 단위 정수입니다.
+          imageUrl, address, benefitText, naverMapUrl은 **없으면 null**로 내려옵니다. distance는 미터 단위이고 **100m 단위로 올림**합니다 (예: 350m → 400).
           """)
   @ApiResponses({
       @ApiResponse(
@@ -54,7 +54,7 @@ public interface PlaceApi {
                                   "address": "서울시 마포구 와우산로 00",
                                   "latitude": 37.551234,
                                   "longitude": 126.923456,
-                                  "distance": 350,
+                                  "distance": 400,
                                   "benefitText": "시니어 커플 10% 할인",
                                   "naverMapUrl": "https://naver.me/xxxx"
                                 },

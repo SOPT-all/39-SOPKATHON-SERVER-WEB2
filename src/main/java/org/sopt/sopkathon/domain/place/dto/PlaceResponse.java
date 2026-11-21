@@ -13,7 +13,7 @@ public record PlaceResponse(
         String address,
     @Schema(description = "위도", example = "37.551234") BigDecimal latitude,
     @Schema(description = "경도", example = "126.923456") BigDecimal longitude,
-    @Schema(description = "내 위치와의 직선 거리 (미터, 정수)", example = "350") int distance,
+    @Schema(description = "내 위치와의 직선 거리 (미터, 100m 단위로 올림)", example = "400") int distance,
     @Schema(description = "제휴 혜택 문구. 없으면 null", nullable = true, example = "시니어 커플 10% 할인")
         String benefitText,
     @Schema(description = "네이버 지도 링크. 없으면 null", nullable = true) String naverMapUrl) {

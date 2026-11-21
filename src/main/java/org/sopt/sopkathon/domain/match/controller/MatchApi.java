@@ -55,7 +55,7 @@ public interface MatchApi {
 
           ① 상대의 전화번호와 좌표는 내려주지 않습니다.
 
-          ② **distance**는 미터 단위 정수입니다. 표시 형식(0.8km 등)은 프론트에서 변환합니다.
+          ② **distance**는 미터 단위이고 **100m 단위로 올림**합니다 (예: 750m → 800). 표시 형식(0.8km 등)은 프론트에서 변환합니다.
           """)
   @ApiResponses({
       @ApiResponse(

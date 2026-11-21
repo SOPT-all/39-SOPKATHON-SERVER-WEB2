@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 public final class DistanceCalculator {
 
   private static final double EARTH_RADIUS_METERS = 6_371_000;
+  private static final int DISPLAY_UNIT_METERS = 100;
 
   private DistanceCalculator() {}
 
@@ -22,5 +23,15 @@ public final class DistanceCalculator {
     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return (int) Math.round(EARTH_RADIUS_METERS * c);
+  }
+
+  /**
+   * 응답에 내려줄 거리. 100m 단위로 올림한다 (1 ~ 100m → 100m).
+   *
+   * <p>장소 좌표와 정확한 거리를 함께 주면 여러 장소와의 거리로 상대 위치(집)를 역산할 수 있어 정밀도를 낮춘다.
+   * 정렬은 정확한 거리로 하고, 응답에만 이 값을 사용한다.
+   */
+  public static int toDisplayDistance(int meters) {
+    return (int) Math.ceil((double) meters / DISPLAY_UNIT_METERS) * DISPLAY_UNIT_METERS;
   }
 }

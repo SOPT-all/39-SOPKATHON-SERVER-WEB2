@@ -68,11 +68,22 @@ class PlaceControllerTest {
         .andExpect(jsonPath("$.data.places[*].placeId").value(contains(
             near.getId().intValue(), far.getId().intValue())))
         .andExpect(jsonPath("$.data.places[0].name").value("가까운곳"))
-        .andExpect(jsonPath("$.data.places[0].distance").value(111))
-        .andExpect(jsonPath("$.data.places[1].distance").value(1112))
+        .andExpect(jsonPath("$.data.places[0].distance").value(200))
+        .andExpect(jsonPath("$.data.places[1].distance").value(1200))
         .andExpect(jsonPath("$.data.page").value(0))
         .andExpect(jsonPath("$.data.size").value(20))
         .andExpect(jsonPath("$.data.hasNext").value(false));
+  }
+
+  @Test
+  void 응답_거리가_같아도_실제로_가까운_장소가_먼저다() throws Exception {
+    Place farther = place("89m", "37.550800");
+    Place nearer = place("11m", "37.550100");
+
+    getPlaces(null, null)
+        .andExpect(jsonPath("$.data.places[*].placeId").value(contains(
+            nearer.getId().intValue(), farther.getId().intValue())))
+        .andExpect(jsonPath("$.data.places[*].distance").value(contains(100, 100)));
   }
 
   @Test
