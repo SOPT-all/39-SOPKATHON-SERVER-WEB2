@@ -12,7 +12,7 @@ public record MatchUserResponse(
             description = "프로필 사진 URL",
             example = "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/xxx.jpg")
         String profileImageUrl,
-    @Schema(description = "내 위치와의 직선 거리 (미터, 정수)", example = "800") int distance) {
+    @Schema(description = "내 위치와의 직선 거리 (미터, 100m 단위로 올림)", example = "800") int distance) {
 
   public static MatchUserResponse from(User user, int distance) {
     return new MatchUserResponse(

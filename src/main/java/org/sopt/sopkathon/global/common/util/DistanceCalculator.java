@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 public final class DistanceCalculator {
 
   private static final double EARTH_RADIUS_METERS = 6_371_000;
+  private static final int DISPLAY_UNIT_METERS = 100;
 
   private DistanceCalculator() {}
 
@@ -22,5 +23,10 @@ public final class DistanceCalculator {
     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return (int) Math.round(EARTH_RADIUS_METERS * c);
+  }
+
+  /** 정확한 거리로 회원 위치를 역산하지 못하도록 응답에만 100m 단위로 올린 값을 쓴다. 정렬은 정확한 거리로 한다. */
+  public static int toDisplayDistance(int meters) {
+    return (int) Math.ceil((double) meters / DISPLAY_UNIT_METERS) * DISPLAY_UNIT_METERS;
   }
 }

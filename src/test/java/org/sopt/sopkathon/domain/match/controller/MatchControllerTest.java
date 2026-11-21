@@ -61,7 +61,7 @@ class MatchControllerTest {
         .andExpect(jsonPath("$.data.users[*].userId").value(contains(
             near.getId().intValue(), far.getId().intValue())))
         .andExpect(jsonPath("$.data.users[0].nickname").value("가까운사람"))
-        .andExpect(jsonPath("$.data.users[0].distance").value(111))
+        .andExpect(jsonPath("$.data.users[0].distance").value(200))
         .andExpect(jsonPath("$.data.users[0].phoneNumber").doesNotExist())
         .andExpect(jsonPath("$.data.users[0].latitude").doesNotExist())
         .andExpect(jsonPath("$.data.hasNext").value(false));

@@ -26,4 +26,10 @@ class DistanceCalculatorTest {
 
     assertThat(distance).isEqualTo(1112);
   }
+
+  @org.junit.jupiter.params.ParameterizedTest
+  @org.junit.jupiter.params.provider.CsvSource({"0, 0", "1, 100", "100, 100", "101, 200", "1112, 1200"})
+  void 응답용_거리는_100m_단위로_올림한다(int meters, int expected) {
+    assertThat(DistanceCalculator.toDisplayDistance(meters)).isEqualTo(expected);
+  }
 }
