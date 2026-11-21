@@ -15,6 +15,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -144,6 +145,22 @@ public class GlobalExceptionHandler {
         request.getRequestURI(),
         e.getParameterName(),
         e.getParameterType()
+    );
+    return errorResponse(GlobalErrorCode.INVALID_REQUEST);
+  }
+
+  /** X-User-Id 같은 필수 헤더 누락 */
+  @ExceptionHandler(MissingRequestHeaderException.class)
+  public ResponseEntity<BaseResponse<Void>> handleMissingRequestHeader(
+      MissingRequestHeaderException e,
+      HttpServletRequest request
+  ) {
+
+    log.warn(
+        "[MissingRequestHeaderException] {} {} → headerName={}",
+        request.getMethod(),
+        request.getRequestURI(),
+        e.getHeaderName()
     );
     return errorResponse(GlobalErrorCode.INVALID_REQUEST);
   }
