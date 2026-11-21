@@ -16,6 +16,21 @@ spring:
     show-sql: false
     open-in-view: false
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+cloud:
+  aws:
+    region: ${AWS_REGION:ap-northeast-2}
+    s3:
+      bucket: ${S3_BUCKET}
+    # 비워두면 기본 자격 증명 체인(EC2 IAM Role, 환경 변수 등)을 사용
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID:}
+      secret-key: ${AWS_SECRET_ACCESS_KEY:}
+
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
 
