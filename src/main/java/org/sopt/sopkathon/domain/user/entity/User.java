@@ -85,6 +85,11 @@ public class User extends BaseEntity {
     return onboardedAt != null;
   }
 
+  /** 거리 계산에 필요한 좌표가 모두 있는지. */
+  public boolean hasLocation() {
+    return latitude != null && longitude != null;
+  }
+
   public void completeOnboarding(
       String nickname,
       Gender gender,
