@@ -29,12 +29,12 @@ public interface PlaceApi {
           내 위치(온보딩 때 저장한 좌표)에서 **가까운 순**으로 제휴 장소를 조회합니다. 위치는 보내지 않습니다.
 
           ### 무한스크롤
-          **page=0**으로 시작해서, **hasNext가 true일 때만 page + 1**로 다음 페이지를 요청합니다.
+          **page=0**부터 시작해 **hasNext가 true일 때만 page + 1**을 요청하고, 받은 목록을 뒤에 이어 붙입니다.
 
-          거리가 같으면 placeId 순이라 페이지를 넘겨도 순서가 바뀌지 않습니다. 반경 제한은 없습니다.
+          요청 중에는 다음 요청을 막고, 이어 붙일 때 **placeId로 중복을 걸러** 주세요.
 
-          ### 참고
-          imageUrl, address, benefitText, naverMapUrl은 **없으면 null**로 내려옵니다. distance는 미터 단위이고 **100m 단위로 올림**합니다 (예: 350m → 400).
+          ### 거리
+          distance는 **100m 단위로 올림**한 값입니다 (350m → 400). 정렬은 실제 거리 기준이라 앞에 있는 장소가 더 가깝습니다.
           """)
   @ApiResponses({
       @ApiResponse(
@@ -53,19 +53,19 @@ public interface PlaceApi {
                             "data": {
                               "places": [
                                 {
-                                  "placeId": 3,
-                                  "name": "소소한 찻집",
-                                  "imageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/place/xxx.jpg",
-                                  "address": "서울시 마포구 와우산로 00",
+                                  "placeId": 1,
+                                  "name": "인사동찻집",
+                                  "imageUrl": "https://spokerthon-39.s3.ap-northeast-2.amazonaws.com/dummy/places/tea_01.png",
+                                  "address": "서울 종로구 인사동길 33-1",
                                   "distance": 400,
-                                  "benefitText": "시니어 커플 10% 할인",
-                                  "naverMapUrl": "https://naver.me/xxxx"
+                                  "benefitText": "시니어 커플 방문 시 전통차 10% 할인",
+                                  "naverMapUrl": "https://map.naver.com/p/entry/place/13151902"
                                 },
                                 {
                                   "placeId": 7,
                                   "name": "공원 산책로 벤치 카페",
                                   "imageUrl": null,
-                                  "address": "서울시 마포구 양화로 00",
+                                  "address": null,
                                   "distance": 1200,
                                   "benefitText": null,
                                   "naverMapUrl": null
@@ -95,7 +95,7 @@ public interface PlaceApi {
               mediaType = "application/json",
               examples = {
                   @ExampleObject(
-                      name = "GLB-E001 헤더 누락, page·size 범위 밖",
+                      name = "GLB-E001 헤더 누락, page·size 범위 밖 (개발 중에만 발생)",
                       value = """
                           {
                             "success": false,
@@ -129,7 +129,7 @@ public interface PlaceApi {
                       """))),
       @ApiResponse(
           responseCode = "500",
-          description = "서버 내부 오류",
+          description = "서버 내부 오류 → 잠시 후 다시 시도해주세요",
           content = @Content(
               mediaType = "application/json",
               examples = @ExampleObject(
