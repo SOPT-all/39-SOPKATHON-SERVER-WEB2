@@ -48,6 +48,24 @@ public enum GlobalErrorCode implements ErrorCode {
       "GLB-E007",
       HttpStatus.TOO_MANY_REQUESTS,
       "요청이 너무 많습니다. 잠시 후 다시 시도해주세요."
+  ),
+
+  PAYLOAD_TOO_LARGE(
+      "GLB-E008",
+      HttpStatus.CONTENT_TOO_LARGE,
+      "요청 크기가 허용 범위를 초과했습니다."
+  ),
+
+  DUPLICATE_RESOURCE(
+      "GLB-E009",
+      HttpStatus.CONFLICT,
+      "이미 처리된 요청입니다."
+  ),
+
+  UNSUPPORTED_MEDIA_TYPE(
+      "GLB-E010",
+      HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+      "지원하지 않는 Content-Type입니다."
   );
 
   private final String code;
