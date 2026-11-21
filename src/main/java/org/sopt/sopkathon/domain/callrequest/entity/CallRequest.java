@@ -13,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,10 +57,6 @@ public class CallRequest extends BaseEntity {
   @Column(nullable = false, length = 20)
   private CallRequestStatus status = CallRequestStatus.PENDING;
 
-  /** 받은 사람이 "전화 걸기"를 누른 시각 */
-  @Column(name = "call_tapped_at")
-  private LocalDateTime callTappedAt;
-
   private CallRequest(User requester, User receiver, String message) {
     this.requester = requester;
     this.receiver = receiver;
@@ -72,10 +67,7 @@ public class CallRequest extends BaseEntity {
     return new CallRequest(requester, receiver, message);
   }
 
-  public void tapCall() {
-    this.callTappedAt = LocalDateTime.now();
-  }
-
+  /** 받은 사람이 전화를 건 뒤 호출한다. 이미 통화한 상대에게 다시 걸어도 CONNECTED가 유지된다. */
   public void connect() {
     this.status = CallRequestStatus.CONNECTED;
   }
