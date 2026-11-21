@@ -18,7 +18,6 @@ import org.sopt.sopkathon.global.response.BaseResponse;
 @Tag(name = "Place", description = "근처 제휴 장소")
 public interface PlaceApi {
 
-  // 기본값·범위는 컨트롤러의 @RequestParam과 Swagger 문서가 함께 참조한다
   String DEFAULT_PAGE = "0";
   String DEFAULT_SIZE = "20";
   int MAX_SIZE = 50;

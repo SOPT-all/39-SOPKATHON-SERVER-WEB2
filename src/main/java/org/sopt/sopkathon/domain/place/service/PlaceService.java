@@ -21,7 +21,6 @@ public class PlaceService {
   private final UserService userService;
   private final PlaceRepository placeRepository;
 
-  /** 장소 수가 적어 활성 장소 전체를 조회해 서버에서 거리 계산·정렬한 뒤 해당 페이지만 자른다. */
   public PlaceListResponse getNearbyPlaces(Long userId, int page, int size) {
     User me = userService.getOnboardedUser(userId);
 

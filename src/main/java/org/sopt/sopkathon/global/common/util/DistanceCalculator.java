@@ -25,12 +25,7 @@ public final class DistanceCalculator {
     return (int) Math.round(EARTH_RADIUS_METERS * c);
   }
 
-  /**
-   * 응답에 내려줄 거리. 100m 단위로 올림한다 (1 ~ 100m → 100m).
-   *
-   * <p>장소 좌표와 정확한 거리를 함께 주면 여러 장소와의 거리로 상대 위치(집)를 역산할 수 있어 정밀도를 낮춘다.
-   * 정렬은 정확한 거리로 하고, 응답에만 이 값을 사용한다.
-   */
+  /** 정확한 거리로 회원 위치를 역산하지 못하도록 응답에만 100m 단위로 올린 값을 쓴다. 정렬은 정확한 거리로 한다. */
   public static int toDisplayDistance(int meters) {
     return (int) Math.ceil((double) meters / DISPLAY_UNIT_METERS) * DISPLAY_UNIT_METERS;
   }

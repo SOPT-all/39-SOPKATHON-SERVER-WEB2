@@ -208,7 +208,6 @@ class PlaceControllerTest {
         .build());
   }
 
-  /** 비활성 처리 기능이 없어서 운영자가 DB에서 바꾸는 것처럼 SQL로 바꾼다. */
   private void deactivate(Place place) {
     entityManager.flush();
     entityManager.createNativeQuery("update places set is_active = false where id = :id")

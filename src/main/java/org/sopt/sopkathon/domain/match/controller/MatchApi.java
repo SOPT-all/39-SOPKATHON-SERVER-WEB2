@@ -18,7 +18,6 @@ import org.sopt.sopkathon.global.response.BaseResponse;
 @Tag(name = "Match", description = "매칭 상대 조회 · 넘기기")
 public interface MatchApi {
 
-  // 기본값·범위는 컨트롤러의 @RequestParam과 Swagger 문서가 함께 참조한다
   String DEFAULT_LIMIT = "10";
   int MAX_LIMIT = 50;
 
