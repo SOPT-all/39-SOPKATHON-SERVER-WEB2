@@ -12,7 +12,6 @@ public class CallRequestService {
 
   private final CallRequestRepository callRequestRepository;
 
-  /** 나와 요청을 주고받은 상대의 ID (내가 보냈거나, 나에게 보낸 경우 모두). */
   @Transactional(readOnly = true)
   public List<Long> findPartnerIds(Long userId) {
     return callRequestRepository.findPartnerIds(userId);

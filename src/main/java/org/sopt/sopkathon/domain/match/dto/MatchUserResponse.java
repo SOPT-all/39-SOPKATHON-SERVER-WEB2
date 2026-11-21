@@ -3,7 +3,6 @@ package org.sopt.sopkathon.domain.match.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.sopkathon.domain.user.entity.User;
 
-/** 매칭 카드에 보여줄 상대 정보. 전화번호와 좌표는 담지 않는다. */
 @Schema(description = "매칭 상대 (전화번호·좌표는 포함하지 않음)")
 public record MatchUserResponse(
     @Schema(description = "상대 회원 ID. 넘기기·요청 보내기 API에 사용", example = "7") Long userId,

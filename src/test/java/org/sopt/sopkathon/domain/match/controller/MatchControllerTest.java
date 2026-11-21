@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.sopt.sopkathon.domain.callrequest.repository.CallRequestRepository;
 import org.sopt.sopkathon.domain.match.entity.MatchSkip;
 import org.sopt.sopkathon.domain.match.repository.MatchSkipRepository;
 import org.sopt.sopkathon.domain.user.entity.Gender;
+import org.sopt.sopkathon.domain.user.entity.OnboardingProfile;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ class MatchControllerTest {
   @Autowired private UserRepository userRepository;
   @Autowired private MatchSkipRepository matchSkipRepository;
   @Autowired private CallRequestRepository callRequestRepository;
+  @Autowired private EntityManager entityManager;
 
   private User me;
 
@@ -85,10 +88,7 @@ class MatchControllerTest {
 
   @Test
   void 좌표가_없는_상대는_제외한다() throws Exception {
-    User noLocation = User.create("01011111111");
-    noLocation.completeOnboarding(
-        "좌표없음", Gender.FEMALE, 30, "https://example.com/a.jpg", null, null);
-    userRepository.save(noLocation);
+    User noLocation = onboardedUserWithoutLocation("01011111111", Gender.FEMALE);
     User visible = onboardedUser("01022222222", "보이는사람", Gender.FEMALE, "37.551000", BASE_LON);
 
     mockMvc
@@ -99,10 +99,7 @@ class MatchControllerTest {
 
   @Test
   void 내_좌표가_없으면_400() throws Exception {
-    User noLocation = User.create("01055555555");
-    noLocation.completeOnboarding(
-        "좌표없음", Gender.MALE, 30, "https://example.com/b.jpg", null, null);
-    userRepository.save(noLocation);
+    User noLocation = onboardedUserWithoutLocation("01055555555", Gender.MALE);
 
     mockMvc
         .perform(get("/api/v1/matches").header("X-User-Id", noLocation.getId()))
@@ -169,13 +166,26 @@ class MatchControllerTest {
   private User onboardedUser(
       String phoneNumber, String nickname, Gender gender, String latitude, String longitude) {
     User user = User.create(phoneNumber);
-    user.completeOnboarding(
-        nickname,
-        gender,
-        30,
-        "https://example.com/" + phoneNumber + ".jpg",
-        new BigDecimal(latitude),
-        new BigDecimal(longitude));
+    user.completeOnboarding(OnboardingProfile.builder()
+        .nickname(nickname)
+        .gender(gender)
+        .age(30)
+        .profileImageUrl("https://example.com/" + phoneNumber + ".jpg")
+        .latitude(new BigDecimal(latitude))
+        .longitude(new BigDecimal(longitude))
+        .build());
     return userRepository.save(user);
+  }
+
+  /** 엔티티로는 좌표 없는 온보딩을 만들 수 없어, DB에 직접 넣은 데이터처럼 SQL로 좌표를 지운다. */
+  private User onboardedUserWithoutLocation(String phoneNumber, Gender gender) {
+    User user = onboardedUser(phoneNumber, "좌표없음", gender, BASE_LAT, BASE_LON);
+    entityManager.flush();
+    entityManager
+        .createNativeQuery("update users set latitude = null, longitude = null where id = :id")
+        .setParameter("id", user.getId())
+        .executeUpdate();
+    entityManager.clear();
+    return user;
   }
 }

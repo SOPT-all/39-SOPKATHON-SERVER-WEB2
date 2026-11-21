@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.sopt.sopkathon.domain.image.ImageDirectory;
 import org.sopt.sopkathon.domain.image.code.ImageErrorCode;
+import org.sopt.sopkathon.support.ImageFixtures;
 import org.sopt.sopkathon.global.exception.BaseException;
 import org.springframework.mock.web.MockMultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -89,8 +90,43 @@ class S3ImageServiceTest {
         ImageDirectory.PROFILE), ImageErrorCode.IMAGE_UPLOAD_FAILED);
   }
 
+  @Test
+  void webp_이미지도_업로드할_수_있다() {
+    s3ImageService.upload(image("profile.webp", "image/webp"), ImageDirectory.PROFILE);
+
+    verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+  }
+
+  @Test
+  void 확장자와_ContentType이_맞아도_파일_내용이_이미지가_아니면_업로드할_수_없다() {
+    MockMultipartFile disguised = new MockMultipartFile(
+        "file", "profile.jpg", "image/jpeg", "<script>alert(1)</script>".getBytes());
+
+    assertErrorCode(() -> s3ImageService.upload(disguised, ImageDirectory.PROFILE),
+        ImageErrorCode.INVALID_IMAGE_TYPE);
+    verify(s3Client, never()).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+  }
+
+  @Test
+  void 실제로는_PNG인데_JPEG라고_보내면_업로드할_수_없다() {
+    MockMultipartFile mismatched =
+        new MockMultipartFile("file", "profile.jpg", "image/jpeg", ImageFixtures.PNG);
+
+    assertErrorCode(() -> s3ImageService.upload(mismatched, ImageDirectory.PROFILE),
+        ImageErrorCode.INVALID_IMAGE_TYPE);
+  }
+
+  @Test
+  void 시그니처보다_짧은_파일은_업로드할_수_없다() {
+    MockMultipartFile tooShort =
+        new MockMultipartFile("file", "profile.png", "image/png", new byte[] {(byte) 0x89, 'P'});
+
+    assertErrorCode(() -> s3ImageService.upload(tooShort, ImageDirectory.PROFILE),
+        ImageErrorCode.INVALID_IMAGE_TYPE);
+  }
+
   private MockMultipartFile image(String filename, String contentType) {
-    return new MockMultipartFile("file", filename, contentType, new byte[]{1, 2, 3});
+    return new MockMultipartFile("file", filename, contentType, ImageFixtures.bytesOf(filename));
   }
 
   private void assertErrorCode(Runnable runnable, ImageErrorCode errorCode) {

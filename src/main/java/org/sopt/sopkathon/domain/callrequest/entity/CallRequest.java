@@ -49,7 +49,6 @@ public class CallRequest extends BaseEntity {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private User receiver;
 
-  /** 요청과 함께 보내는 한 줄 메시지 (선택) */
   @Column(length = 100)
   private String message;
 
@@ -67,7 +66,6 @@ public class CallRequest extends BaseEntity {
     return new CallRequest(requester, receiver, message);
   }
 
-  /** 받은 사람이 전화를 건 뒤 호출한다. 이미 통화한 상대에게 다시 걸어도 CONNECTED가 유지된다. */
   public void connect() {
     this.status = CallRequestStatus.CONNECTED;
   }
