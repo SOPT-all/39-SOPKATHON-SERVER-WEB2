@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
+import org.sopt.sopkathon.domain.auth.dto.LoginRequest;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -25,12 +27,13 @@ class AuthControllerTest {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private UserRepository userRepository;
+  @Autowired private ObjectMapper objectMapper;
 
   private ResultActions login(String phoneNumber) throws Exception {
     return mockMvc.perform(
         post("/api/v1/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
-            .content("{\"phoneNumber\": \"" + phoneNumber + "\"}"));
+            .content(objectMapper.writeValueAsString(new LoginRequest(phoneNumber))));
   }
 
   @Test
