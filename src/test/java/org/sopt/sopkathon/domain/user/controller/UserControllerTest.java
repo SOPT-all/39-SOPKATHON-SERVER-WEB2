@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.sopt.sopkathon.domain.user.entity.Gender;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.repository.UserRepository;
+import org.sopt.sopkathon.support.ImageFixtures;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -237,6 +238,6 @@ class UserControllerTest {
   }
 
   private MockMultipartFile jpeg() {
-    return new MockMultipartFile("profileImage", "selfie.jpg", "image/jpeg", new byte[] {1, 2, 3});
+    return new MockMultipartFile("profileImage", "selfie.jpg", "image/jpeg", ImageFixtures.JPEG);
   }
 }
