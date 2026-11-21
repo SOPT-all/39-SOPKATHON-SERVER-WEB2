@@ -35,10 +35,12 @@ public class MatchService {
     List<MatchUserResponse> sorted =
         userService.findOnboardedByGenderExcluding(oppositeOf(me.getGender()), excludedIds(me))
             .stream()
-            .map(candidate -> MatchUserResponse.from(candidate, distanceBetween(me, candidate)))
+            .map(candidate -> new Candidate(candidate, distanceBetween(me, candidate)))
             .sorted(
-                Comparator.comparingInt(MatchUserResponse::distance)
-                    .thenComparing(MatchUserResponse::userId))
+                Comparator.comparingInt(Candidate::distance)
+                    .thenComparing(candidate -> candidate.user().getId()))
+            .map(candidate -> MatchUserResponse.from(
+                candidate.user(), DistanceCalculator.toDisplayDistance(candidate.distance())))
             .toList();
 
     boolean hasNext = sorted.size() > limit;
@@ -71,6 +73,8 @@ public class MatchService {
   private Gender oppositeOf(Gender gender) {
     return gender == Gender.MALE ? Gender.FEMALE : Gender.MALE;
   }
+
+  private record Candidate(User user, int distance) {}
 
   private int distanceBetween(User me, User other) {
     return DistanceCalculator.distanceInMeters(
