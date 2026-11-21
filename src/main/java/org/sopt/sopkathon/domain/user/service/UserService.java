@@ -51,6 +51,16 @@ public class UserService {
     return user;
   }
 
+  /** 요청 상대처럼 다른 회원을 지정할 때 사용한다. 온보딩 전 회원은 아직 보이지 않는 회원이라 없는 회원(404)으로 본다. */
+  @Transactional(readOnly = true)
+  public User getOnboardedTarget(Long userId) {
+    User user = getUser(userId);
+    if (!user.isOnboarded()) {
+      throw new BaseException(UserErrorCode.USER_NOT_FOUND);
+    }
+    return user;
+  }
+
   @Transactional(readOnly = true)
   public List<User> findOnboardedByGenderExcluding(Gender gender, Collection<Long> excludedIds) {
     if (excludedIds.isEmpty()) {
