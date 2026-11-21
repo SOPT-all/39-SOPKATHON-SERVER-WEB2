@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.sopt.sopkathon.domain.place.entity.Place;
 import org.sopt.sopkathon.domain.place.repository.PlaceRepository;
 import org.sopt.sopkathon.domain.user.entity.Gender;
+import org.sopt.sopkathon.domain.user.entity.OnboardingProfile;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +44,14 @@ class PlaceControllerTest {
   @BeforeEach
   void setUp() {
     me = User.create("01000000000");
-    me.completeOnboarding(
-        "나", Gender.MALE, 65, "https://example.com/me.jpg",
-        new BigDecimal(BASE_LAT), new BigDecimal(BASE_LON));
+    me.completeOnboarding(OnboardingProfile.builder()
+        .nickname("나")
+        .gender(Gender.MALE)
+        .age(65)
+        .profileImageUrl("https://example.com/me.jpg")
+        .latitude(new BigDecimal(BASE_LAT))
+        .longitude(new BigDecimal(BASE_LON))
+        .build());
     userRepository.save(me);
   }
 
