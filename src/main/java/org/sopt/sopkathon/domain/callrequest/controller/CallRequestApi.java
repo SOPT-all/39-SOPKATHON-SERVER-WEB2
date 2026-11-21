@@ -242,22 +242,8 @@ public interface CallRequestApi {
                       }
                       """))),
       @ApiResponse(
-          responseCode = "403",
-          description = "내가 받은 요청이 아님 (보낸 사람이나 다른 회원이 호출)",
-          content = @Content(
-              mediaType = "application/json",
-              examples = @ExampleObject(
-                  name = "GLB-E003",
-                  value = """
-                      {
-                        "success": false,
-                        "code": "GLB-E003",
-                        "message": "접근 권한이 없습니다."
-                      }
-                      """))),
-      @ApiResponse(
           responseCode = "404",
-          description = "존재하지 않는 요청",
+          description = "존재하지 않거나 내가 받은 요청이 아님 (보낸 사람·다른 회원이 호출)",
           content = @Content(
               mediaType = "application/json",
               examples = @ExampleObject(

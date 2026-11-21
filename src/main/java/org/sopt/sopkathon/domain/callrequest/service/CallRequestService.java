@@ -11,7 +11,6 @@ import org.sopt.sopkathon.domain.callrequest.repository.CallRequestRepository;
 import org.sopt.sopkathon.domain.match.service.MatchSkipService;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.service.UserService;
-import org.sopt.sopkathon.global.common.code.GlobalErrorCode;
 import org.sopt.sopkathon.global.exception.BaseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,11 +55,8 @@ public class CallRequestService {
   @Transactional
   public CallRequestConnectResponse connect(Long userId, Long requestId) {
     CallRequest callRequest = callRequestRepository
-        .findById(requestId)
+        .findByIdAndReceiverId(requestId, userId)
         .orElseThrow(() -> new BaseException(CallRequestErrorCode.CALL_REQUEST_NOT_FOUND));
-    if (!callRequest.getReceiver().getId().equals(userId)) {
-      throw new BaseException(GlobalErrorCode.FORBIDDEN);
-    }
     callRequest.connect();
     return CallRequestConnectResponse.from(callRequest);
   }

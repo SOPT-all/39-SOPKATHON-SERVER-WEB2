@@ -72,19 +72,19 @@ class CallRequestConnectControllerTest {
   }
 
   @Test
-  void 보낸_사람이_호출하면_403이고_상태는_그대로다() throws Exception {
+  void 보낸_사람이_호출하면_없는_요청처럼_404이고_상태는_그대로다() throws Exception {
     connect(requester.getId(), callRequest.getId())
-        .andExpect(status().isForbidden())
-        .andExpect(jsonPath("$.code").value("GLB-E003"));
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.code").value("REQ-E005"));
 
     assertThat(statusInDb()).isEqualTo(CallRequestStatus.PENDING);
   }
 
   @Test
-  void 관계없는_회원이_호출하면_403() throws Exception {
+  void 관계없는_회원이_호출하면_없는_요청처럼_404() throws Exception {
     connect(stranger.getId(), callRequest.getId())
-        .andExpect(status().isForbidden())
-        .andExpect(jsonPath("$.code").value("GLB-E003"));
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.code").value("REQ-E005"));
 
     assertThat(statusInDb()).isEqualTo(CallRequestStatus.PENDING);
   }
