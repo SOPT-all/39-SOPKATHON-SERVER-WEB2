@@ -1,4 +1,4 @@
-package org.sopt.sopkathon.global.s3;
+package org.sopt.sopkathon.domain.image.service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,7 +6,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.sopkathon.global.common.code.ImageErrorCode;
+import org.sopt.sopkathon.domain.image.ImageDirectory;
+import org.sopt.sopkathon.domain.image.code.ImageErrorCode;
 import org.sopt.sopkathon.global.exception.BaseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,11 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
- * S3 이미지 업로드/삭제 공통 서비스.
- * 반환하는 URL을 그대로 DB에 저장하고, 삭제 시 같은 URL을 넘기면 된다.
+ * S3 이미지 업로드 공통 서비스. 반환하는 URL을 그대로 DB에 저장하면 된다.
  */
 @Slf4j
 @Service
@@ -37,7 +36,6 @@ public class S3ImageService {
 
   private final S3Client s3Client;
   private final String bucket;
-  private final String urlPrefix;
 
   public S3ImageService(
       S3Client s3Client,
@@ -45,16 +43,6 @@ public class S3ImageService {
   ) {
     this.s3Client = s3Client;
     this.bucket = bucket;
-    this.urlPrefix = resolveUrlPrefix(s3Client, bucket);
-  }
-
-  // 빈 key는 허용되지 않으므로 임시 key로 URL을 만든 뒤 key 부분을 잘라낸다
-  private static String resolveUrlPrefix(S3Client s3Client, String bucket) {
-    String placeholder = "placeholder";
-    String url = s3Client.utilities()
-        .getUrl(GetUrlRequest.builder().bucket(bucket).key(placeholder).build())
-        .toString();
-    return url.substring(0, url.length() - placeholder.length());
   }
 
   /**
@@ -88,29 +76,9 @@ public class S3ImageService {
       throw new BaseException(ImageErrorCode.IMAGE_UPLOAD_FAILED, e);
     }
 
-    return urlPrefix + key;
-  }
-
-  /**
-   * @param imageUrl {@link #upload}가 반환한 이미지 URL
-   */
-  public void delete(String imageUrl) {
-    if (!StringUtils.hasText(imageUrl) || !imageUrl.startsWith(urlPrefix)
-        || imageUrl.length() == urlPrefix.length()) {
-      throw new BaseException(ImageErrorCode.INVALID_IMAGE_URL);
-    }
-
-    String key = imageUrl.substring(urlPrefix.length());
-
-    try {
-      s3Client.deleteObject(DeleteObjectRequest.builder()
-          .bucket(bucket)
-          .key(key)
-          .build());
-    } catch (SdkException e) {
-      log.error("[S3] 이미지 삭제 실패 key={}", key, e);
-      throw new BaseException(ImageErrorCode.IMAGE_DELETE_FAILED, e);
-    }
+    return s3Client.utilities()
+        .getUrl(GetUrlRequest.builder().bucket(bucket).key(key).build())
+        .toString();
   }
 
   private String extractExtension(String filename) {

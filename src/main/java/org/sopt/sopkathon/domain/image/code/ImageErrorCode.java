@@ -1,7 +1,8 @@
-package org.sopt.sopkathon.global.common.code;
+package org.sopt.sopkathon.domain.image.code;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.sopt.sopkathon.global.common.code.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -20,22 +21,10 @@ public enum ImageErrorCode implements ErrorCode {
       "지원하지 않는 이미지 형식입니다. (jpg, jpeg, png, webp)"
   ),
 
-  INVALID_IMAGE_URL(
-      "IMG-E003",
-      HttpStatus.BAD_REQUEST,
-      "올바르지 않은 이미지 URL입니다."
-  ),
-
   IMAGE_UPLOAD_FAILED(
-      "IMG-E004",
+      "IMG-E003",
       HttpStatus.INTERNAL_SERVER_ERROR,
       "이미지 업로드에 실패했습니다."
-  ),
-
-  IMAGE_DELETE_FAILED(
-      "IMG-E005",
-      HttpStatus.INTERNAL_SERVER_ERROR,
-      "이미지 삭제에 실패했습니다."
   );
 
   private final String code;

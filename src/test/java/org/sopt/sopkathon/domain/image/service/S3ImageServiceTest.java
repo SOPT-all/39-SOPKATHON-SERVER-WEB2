@@ -1,4 +1,4 @@
-package org.sopt.sopkathon.global.s3;
+package org.sopt.sopkathon.domain.image.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -11,14 +11,14 @@ import static org.mockito.Mockito.verify;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.sopt.sopkathon.global.common.code.ImageErrorCode;
+import org.sopt.sopkathon.domain.image.ImageDirectory;
+import org.sopt.sopkathon.domain.image.code.ImageErrorCode;
 import org.sopt.sopkathon.global.exception.BaseException;
 import org.springframework.mock.web.MockMultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Utilities;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
@@ -87,23 +87,6 @@ class S3ImageServiceTest {
 
     assertErrorCode(() -> s3ImageService.upload(image("profile.jpg", "image/jpeg"),
         ImageDirectory.PROFILE), ImageErrorCode.IMAGE_UPLOAD_FAILED);
-  }
-
-  @Test
-  void 업로드한_이미지_URL로_삭제할_수_있다() {
-    s3ImageService.delete(URL_PREFIX + "profile/abc.png");
-
-    ArgumentCaptor<DeleteObjectRequest> captor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
-    verify(s3Client).deleteObject(captor.capture());
-    assertThat(captor.getValue().bucket()).isEqualTo(BUCKET);
-    assertThat(captor.getValue().key()).isEqualTo("profile/abc.png");
-  }
-
-  @Test
-  void 다른_버킷의_URL은_삭제할_수_없다() {
-    assertErrorCode(() -> s3ImageService.delete("https://other.s3.amazonaws.com/profile/abc.png"),
-        ImageErrorCode.INVALID_IMAGE_URL);
-    verify(s3Client, never()).deleteObject(any(DeleteObjectRequest.class));
   }
 
   private MockMultipartFile image(String filename, String contentType) {

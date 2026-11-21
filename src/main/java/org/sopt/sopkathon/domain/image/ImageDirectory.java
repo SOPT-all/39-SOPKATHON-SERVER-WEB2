@@ -1,4 +1,4 @@
-package org.sopt.sopkathon.global.s3;
+package org.sopt.sopkathon.domain.image;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
