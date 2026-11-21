@@ -70,6 +70,8 @@ class PlaceControllerTest {
         .andExpect(jsonPath("$.data.places[0].name").value("가까운곳"))
         .andExpect(jsonPath("$.data.places[0].distance").value(200))
         .andExpect(jsonPath("$.data.places[1].distance").value(1200))
+        .andExpect(jsonPath("$.data.places[0].latitude").doesNotExist())
+        .andExpect(jsonPath("$.data.places[0].longitude").doesNotExist())
         .andExpect(jsonPath("$.data.page").value(0))
         .andExpect(jsonPath("$.data.size").value(20))
         .andExpect(jsonPath("$.data.hasNext").value(false));

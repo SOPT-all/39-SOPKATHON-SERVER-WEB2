@@ -57,8 +57,6 @@ public interface PlaceApi {
                                   "name": "소소한 찻집",
                                   "imageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/place/xxx.jpg",
                                   "address": "서울시 마포구 와우산로 00",
-                                  "latitude": 37.551234,
-                                  "longitude": 126.923456,
                                   "distance": 400,
                                   "benefitText": "시니어 커플 10% 할인",
                                   "naverMapUrl": "https://naver.me/xxxx"
@@ -68,8 +66,6 @@ public interface PlaceApi {
                                   "name": "공원 산책로 벤치 카페",
                                   "imageUrl": null,
                                   "address": "서울시 마포구 양화로 00",
-                                  "latitude": 37.554321,
-                                  "longitude": 126.920001,
                                   "distance": 1200,
                                   "benefitText": null,
                                   "naverMapUrl": null
