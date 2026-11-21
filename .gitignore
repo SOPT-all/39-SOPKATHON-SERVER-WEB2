@@ -48,3 +48,6 @@ logs/
 
 ### Editor temp files ###
 *.tmp.*
+
+### custom
+docs/
