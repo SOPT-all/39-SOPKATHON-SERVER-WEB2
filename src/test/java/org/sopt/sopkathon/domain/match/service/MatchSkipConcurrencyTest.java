@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.sopt.sopkathon.domain.match.repository.MatchSkipRepository;
 import org.sopt.sopkathon.domain.user.entity.Gender;
+import org.sopt.sopkathon.domain.user.entity.OnboardingProfile;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,9 +108,14 @@ class MatchSkipConcurrencyTest {
 
   private User onboardedUser(String phoneNumber, Gender gender) {
     User user = User.create(phoneNumber);
-    user.completeOnboarding(
-        "동시성", gender, 30, "https://example.com/a.jpg",
-        new BigDecimal("37.550000"), new BigDecimal("126.920000"));
+    user.completeOnboarding(OnboardingProfile.builder()
+        .nickname("동시성")
+        .gender(gender)
+        .age(30)
+        .profileImageUrl("https://example.com/a.jpg")
+        .latitude(new BigDecimal("37.550000"))
+        .longitude(new BigDecimal("126.920000"))
+        .build());
     return userRepository.save(user);
   }
 }

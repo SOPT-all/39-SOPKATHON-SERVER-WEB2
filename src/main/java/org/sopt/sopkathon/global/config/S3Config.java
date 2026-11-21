@@ -31,9 +31,7 @@ public class S3Config {
         .build();
   }
 
-  /**
-   * 키가 설정되어 있으면(로컬) 해당 키를, 없으면(운영 EC2 IAM Role 등) 기본 자격 증명 체인을 사용한다.
-   */
+  /** 키가 있으면(로컬) 정적 키, 없으면(EC2 IAM Role 등) 기본 자격 증명 체인을 사용한다. */
   private AwsCredentialsProvider credentialsProvider() {
     if (StringUtils.hasText(accessKey) && StringUtils.hasText(secretKey)) {
       return StaticCredentialsProvider.create(

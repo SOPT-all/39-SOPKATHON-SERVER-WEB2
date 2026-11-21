@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.sopt.sopkathon.domain.match.repository.MatchSkipRepository;
 import org.sopt.sopkathon.domain.user.entity.Gender;
+import org.sopt.sopkathon.domain.user.entity.OnboardingProfile;
 import org.sopt.sopkathon.domain.user.entity.User;
 import org.sopt.sopkathon.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,13 +136,14 @@ class MatchSkipControllerTest {
 
   private User onboardedUser(String phoneNumber, String nickname, Gender gender, String latitude) {
     User user = User.create(phoneNumber);
-    user.completeOnboarding(
-        nickname,
-        gender,
-        30,
-        "https://example.com/" + phoneNumber + ".jpg",
-        new BigDecimal(latitude),
-        new BigDecimal("126.920000"));
+    user.completeOnboarding(OnboardingProfile.builder()
+        .nickname(nickname)
+        .gender(gender)
+        .age(30)
+        .profileImageUrl("https://example.com/" + phoneNumber + ".jpg")
+        .latitude(new BigDecimal(latitude))
+        .longitude(new BigDecimal("126.920000"))
+        .build());
     return userRepository.save(user);
   }
 }
