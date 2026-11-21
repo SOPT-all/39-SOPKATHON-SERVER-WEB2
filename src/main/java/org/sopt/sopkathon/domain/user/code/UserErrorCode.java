@@ -25,6 +25,12 @@ public enum UserErrorCode implements ErrorCode {
       "USR-E003",
       HttpStatus.BAD_REQUEST,
       "온보딩을 완료하지 않은 유저입니다."
+  ),
+
+  ALREADY_ONBOARDED(
+      "USR-E004",
+      HttpStatus.CONFLICT,
+      "이미 온보딩을 완료한 유저입니다."
   );
 
   private final String code;

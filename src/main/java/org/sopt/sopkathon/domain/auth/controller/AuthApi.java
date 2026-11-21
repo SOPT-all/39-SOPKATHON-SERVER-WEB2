@@ -10,7 +10,6 @@ import org.sopt.sopkathon.domain.auth.dto.LoginRequest;
 import org.sopt.sopkathon.domain.auth.dto.LoginResponse;
 import org.sopt.sopkathon.global.response.BaseResponse;
 
-/** {@link AuthController}의 Swagger 명세. 컨트롤러에는 동작 코드만 두고 문서는 여기서 관리한다. */
 @Tag(name = "Auth", description = "전화번호 로그인")
 public interface AuthApi {
 

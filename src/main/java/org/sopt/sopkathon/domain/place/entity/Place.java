@@ -41,7 +41,6 @@ public class Place extends BaseEntity {
   @Column(nullable = false, precision = 9, scale = 6)
   private BigDecimal longitude;
 
-  /** 제휴 혜택 문구. 혜택이 없으면 null */
   @Column(name = "benefit_text")
   private String benefitText;
 
@@ -51,7 +50,6 @@ public class Place extends BaseEntity {
   @Column(name = "is_active", nullable = false)
   private boolean active = true;
 
-  /** 필드가 많아 빌더로 생성한다. id와 active(기본 true)는 받지 않는다. */
   @Builder
   private Place(
       String name,

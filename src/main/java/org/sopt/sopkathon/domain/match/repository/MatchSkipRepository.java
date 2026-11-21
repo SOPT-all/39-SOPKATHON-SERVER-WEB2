@@ -10,7 +10,6 @@ public interface MatchSkipRepository extends JpaRepository<MatchSkip, Long> {
 
   boolean existsByUserIdAndTargetId(Long userId, Long targetId);
 
-  /** 내가 넘긴 상대의 ID */
   @Query("select s.target.id from MatchSkip s where s.user.id = :userId")
   List<Long> findTargetIdsByUserId(@Param("userId") Long userId);
 }
